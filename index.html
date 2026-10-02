@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="Bloom-Treppe Säure-Base-Chemie: differenzierte Lernapp mit Basis- und Erweiterungsstufen.">
+<meta name="theme-color" content="#F2F5F4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F151B" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Säure-Base-Chemie: Bloom-Treppe</title>
+<style>
+@font-face{font-family:"Atkinson Hyperlegible";font-style:normal;font-weight:400;font-display:swap;src:url("fonts/atkinson-hyperlegible-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Atkinson Hyperlegible";font-style:normal;font-weight:700;font-display:swap;src:url("fonts/atkinson-hyperlegible-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:200 800;font-display:swap;src:url("fonts/bricolage-grotesque-latin-standard-normal.woff2") format("woff2-variations"),url("fonts/bricolage-grotesque-latin-standard-normal.woff2") format("woff2")}
+:root{
+  --paper:#F2F5F4; --paper2:#E8EEEC; --surface:#FFFFFF; --ink:#141C24; --muted:#56636E; --line:#D5DDE0;
+  --ok:#1F7A47; --okbg:#E2F4EA; --bad:#B3261E; --badbg:#FCEBE8; --focus:#1F5FD1;
+  --s1:#D7263D; --s2:#EE7B22; --s3:#E2B91F; --s4:#2F9A55; --s5:#2F6FDE; --s6:#6B3FA0;
+  --t1:#fff; --t2:#1A1206; --t3:#1A1606; --t4:#fff; --t5:#fff; --t6:#fff;
+  --spectrum:linear-gradient(90deg,var(--s1),var(--s2),var(--s3),var(--s4),var(--s5),var(--s6));
+  --shadow:0 1px 2px rgba(20,28,36,.06),0 6px 20px -8px rgba(20,28,36,.14);
+  --shadow-lg:0 2px 4px rgba(20,28,36,.06),0 14px 34px -12px rgba(20,28,36,.22);
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --navh:0px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F151B; --paper2:#151E26; --surface:#19232C; --ink:#E7EDF1; --muted:#9BA9B4; --line:#2A3641;
+    --ok:#6BCB93; --okbg:#15301F; --bad:#F2877D; --badbg:#3A1B19; --focus:#8AB0F7;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px -10px rgba(0,0,0,.6); --shadow-lg:0 2px 4px rgba(0,0,0,.3),0 16px 36px -12px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F151B; --paper2:#151E26; --surface:#19232C; --ink:#E7EDF1; --muted:#9BA9B4; --line:#2A3641;
+  --ok:#6BCB93; --okbg:#15301F; --bad:#F2877D; --badbg:#3A1B19; --focus:#8AB0F7;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px -10px rgba(0,0,0,.6); --shadow-lg:0 2px 4px rgba(0,0,0,.3),0 16px 36px -12px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;-webkit-tap-highlight-color:transparent}
+button,input,textarea,select{font:inherit;color:inherit}
+button{touch-action:manipulation}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+img,svg{max-width:100%}
+code{font-size:.9em;background:var(--paper2);padding:1px 5px;border-radius:5px}
+
+/* App-Leiste */
+.appbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line)}
+.appbar::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:var(--spectrum);opacity:.9}
+.appbar-in{max-width:1080px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:18px;margin:0;background:none;border:0;padding:0;cursor:pointer;color:var(--ink)}
+.brand svg{width:30px;height:30px;flex:none}
+.nav{display:flex;gap:4px}
+.nav button{border:0;background:transparent;border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:700;font-size:15px;color:var(--muted)}
+.nav button:hover{color:var(--ink);background:var(--paper2)}
+.nav button[aria-current="page"]{color:var(--ink);background:var(--surface);box-shadow:var(--shadow)}
+
+.wrap{max-width:1080px;margin:0 auto;padding:22px 20px 72px}
+.hero h1{font-family:var(--display);font-weight:800;font-size:clamp(32px,6vw,58px);line-height:1;letter-spacing:-.025em;margin:6px 0 10px}
+.lede{color:var(--muted);max-width:60ch;margin:0}
+
+.btn{border:1.5px solid var(--ink);background:var(--surface);border-radius:999px;padding:10px 18px;min-height:44px;cursor:pointer;font-weight:700;font-size:16px;transition:transform .12s ease, box-shadow .12s ease}
+.btn:hover{box-shadow:var(--shadow)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn[disabled]{opacity:.38;cursor:not-allowed;box-shadow:none;transform:none}
+.link{background:none;border:0;padding:6px 0;min-height:36px;color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px;cursor:pointer;font-weight:700;font-size:16px}
+
+/* Themen */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0;padding:2px}
+.tab{flex:none;border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:10px 14px 9px;min-height:52px;cursor:pointer;text-align:left;font-size:15px;font-weight:700;line-height:1.2;display:flex;flex-direction:column;gap:7px;transition:border-color .15s, box-shadow .15s}
+.tab:hover{border-color:var(--ink)}
+.tab[aria-current="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper);box-shadow:var(--shadow)}
+.segs{display:flex;gap:3px}
+.segs i{width:16px;height:5px;border-radius:3px;background:var(--line)}
+.segs i.full{background:var(--c)}
+.tab[aria-current="true"] .segs i:not(.full){background:color-mix(in srgb,var(--paper) 30%,transparent)}
+.segs i.gap{margin-left:5px}
+
+/* Treppe */
+.stage{margin:22px 0 0;background:var(--surface);border-radius:22px;box-shadow:var(--shadow);padding:22px 22px 14px}
+.stairs{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;align-items:end;height:250px}
+.step{--c:var(--s1);--t:var(--t1);position:relative;border:2.5px solid var(--c);background:color-mix(in srgb,var(--c) 9%,var(--surface));color:var(--ink);
+  border-radius:12px 12px 4px 4px;cursor:pointer;text-align:left;padding:10px 10px 10px;display:flex;flex-direction:column;justify-content:flex-start;gap:2px;
+  transition:transform .18s cubic-bezier(.2,.8,.3,1.2), box-shadow .18s}
+.step:hover{transform:translateY(-4px);box-shadow:0 10px 18px -10px var(--c)}
+.step .n{font-family:var(--display);font-weight:800;font-size:28px;line-height:1}
+.step .nm{font-family:var(--display);font-weight:700;font-size:15px;line-height:1.15;overflow-wrap:anywhere;hyphens:auto}
+.step .st{font-size:13px;margin-top:auto;opacity:.92}
+.step .chk{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:var(--t);color:var(--c);display:grid;place-items:center;font-size:13px;font-weight:800}
+.step.done,.step.skipped{background:var(--c);color:var(--t)}
+.step.done{background:linear-gradient(180deg,color-mix(in srgb,#fff 14%,var(--c)),var(--c) 60%)}
+.step.current{box-shadow:0 0 0 3px var(--surface),0 0 0 6px var(--c),0 12px 20px -10px var(--c);transform:translateY(-4px)}
+.step:nth-child(1){height:36%;--c:var(--s1);--t:var(--t1)}
+.step:nth-child(2){height:49%;--c:var(--s2);--t:var(--t2)}
+.step:nth-child(3){height:62%;--c:var(--s3);--t:var(--t3)}
+.step:nth-child(4){height:75%;--c:var(--s4);--t:var(--t4)}
+.step:nth-child(5){height:88%;--c:var(--s5);--t:var(--t5)}
+.step:nth-child(6){height:100%;--c:var(--s6);--t:var(--t6)}
+.floor{height:5px;background:var(--ink);border-radius:3px;margin-top:-1px}
+.zones{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 0;font-size:14px;color:var(--muted)}
+.zones div{padding-top:2px}
+.zones b{color:var(--ink)}
+
+/* Inhalt */
+.panel{max-width:780px;margin-top:30px}
+.lvlhead{position:relative;padding:18px 20px;margin-bottom:16px;border-radius:18px;background:color-mix(in srgb,var(--c,var(--ink)) 12%,var(--surface));border:1.5px solid color-mix(in srgb,var(--c,var(--ink)) 35%,transparent)}
+.lvlhead h2{font-family:var(--display);font-weight:800;font-size:clamp(24px,4vw,34px);line-height:1.1;margin:0 0 6px;letter-spacing:-.01em}
+.lvlhead p{margin:0;color:var(--muted)}
+h2.plain{font-family:var(--display);font-weight:800;font-size:clamp(26px,4vw,32px);margin:0 0 10px;letter-spacing:-.01em;line-height:1.1}
+h3{font-family:var(--display);font-weight:700;font-size:20px;margin:0 0 8px}
+.badge{display:inline-block;font-family:var(--body);font-size:13px;font-weight:700;border-radius:999px;padding:3px 10px;margin-left:8px;vertical-align:middle;background:var(--surface);border:1.5px solid currentColor;letter-spacing:0}
+.progressbar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin:0 0 18px}
+.progressbar i{display:block;height:100%;background:var(--c,var(--ink));border-radius:4px;transition:width .4s ease}
+
+.task{background:var(--surface);border-radius:18px;padding:22px;margin:0 0 16px;box-shadow:var(--shadow)}
+.task .k{font-size:13px;color:var(--muted);margin:0 0 6px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.task .q{margin:0 0 16px;white-space:pre-line;overflow-wrap:anywhere;font-size:18px}
+.fig{background:var(--paper);border-radius:12px;padding:10px;margin:0 0 16px;overflow-x:auto}
+.fig svg{display:block;width:100%;max-width:520px;height:auto;margin:0 auto}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;background:var(--paper);border:2px solid transparent;border-radius:14px;padding:12px 14px;min-height:54px;cursor:pointer;display:flex;gap:12px;align-items:center;transition:border-color .15s, background .15s, transform .1s}
+.opt:hover:not([disabled]){border-color:var(--ink)}
+.opt:active:not([disabled]){transform:scale(.99)}
+.opt .l{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:14px;background:var(--surface);border:1.5px solid var(--line)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg);opacity:.8}
+.opt.wrong span:last-child{text-decoration:line-through;text-decoration-thickness:1.5px}
+.opt.wrong .l{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt.right{border-color:var(--ok);background:var(--okbg);font-weight:700}
+.opt.right .l{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt[disabled]{cursor:default}
+.numrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.numrow input{width:160px;min-height:48px;padding:10px 14px;border:2px solid var(--line);border-radius:12px;background:var(--paper);font-size:18px}
+.numrow input:focus{border-color:var(--ink);outline:none}
+textarea{width:100%;min-height:160px;padding:14px;border:2px solid var(--line);border-radius:14px;background:var(--paper);resize:vertical;line-height:1.5;font-size:17px}
+textarea:focus{border-color:var(--ink);outline:none}
+.eq{font-family:var(--display);font-weight:700;font-size:clamp(19px,3.6vw,26px);text-align:center;background:var(--paper);border-radius:12px;padding:14px;margin:0 0 14px;overflow-x:auto;white-space:nowrap}
+.assign{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.assign label{display:flex;flex-direction:column;gap:8px;background:var(--paper);border:2px solid transparent;border-radius:14px;padding:12px}
+.assign label.wrong{border-color:var(--bad);background:var(--badbg)}
+.assign label.right{border-color:var(--ok);background:var(--okbg)}
+.assign .f{font-family:var(--display);font-weight:700;font-size:22px;text-align:center}
+.assign select{width:100%;min-height:44px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font-size:16px}
+.fb{display:flex;gap:12px;align-items:flex-start;margin:14px 0 0;padding:12px 14px;border-radius:14px;font-size:16px}
+.fb .ico{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:14px;margin-top:1px}
+.fb.ok{background:var(--okbg)} .fb.ok .ico{background:var(--ok)}
+.fb.bad{background:var(--badbg)} .fb.bad .ico{background:var(--bad)}
+.fb.info{background:var(--paper2)} .fb.info .ico{background:var(--muted)}
+.hint{font-size:14px;color:var(--muted);margin:8px 0 0}
+.hints{margin:14px 0 0}
+.hints .tip{margin:8px 0 0;padding:10px 14px;border-radius:12px;background:color-mix(in srgb,var(--s3) 20%,var(--surface));font-size:16px}
+.crit{margin:16px 0 0;padding:16px;border-radius:14px;background:var(--paper)}
+.crit p{margin:0 0 8px;font-weight:700}
+.crit label{display:flex;gap:12px;align-items:flex-start;padding:8px 0;cursor:pointer;min-height:40px}
+.crit input{margin-top:3px;width:22px;height:22px;flex:none;accent-color:var(--ok)}
+details{margin-top:14px;background:var(--paper);border-radius:14px;padding:12px 16px}
+summary{cursor:pointer;font-weight:700;min-height:28px}
+details .sample{margin:10px 0 0;white-space:pre-line}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.jump{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;border:2px dashed var(--line);border-radius:16px;padding:14px 18px;margin:0 0 16px}
+.jump p{margin:0;flex:1 1 260px}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0}
+.choice{position:relative;text-align:left;background:var(--surface);border:0;border-radius:18px;padding:20px 20px 20px;cursor:pointer;box-shadow:var(--shadow);overflow:hidden;transition:transform .15s, box-shadow .15s}
+.choice::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--spectrum)}
+.choice:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.choice b{display:block;font-family:var(--display);font-size:20px;margin-bottom:4px}
+.choice span{color:var(--muted)}
+
+.tcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin:14px 0 0}
+.tcard{text-align:left;background:var(--surface);border:2px solid transparent;border-radius:18px;padding:16px;cursor:pointer;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;transition:transform .15s, border-color .15s}
+.tcard:hover{transform:translateY(-2px)}
+.tcard[aria-current="true"]{border-color:var(--ink)}
+.tcard b{font-family:var(--display);font-size:18px;line-height:1.2}
+.tcard small{color:var(--muted);font-size:14px}
+.tcard .segs i{flex:1;height:7px}
+
+.sumlist{list-style:none;padding:0;margin:0 0 20px;background:var(--surface);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.sumlist li{display:flex;gap:12px;align-items:center;padding:8px 16px;border-bottom:1px solid var(--line)}
+.sumlist li:last-child{border-bottom:0}
+.dot{width:16px;height:16px;border-radius:50%;flex:none;border:2.5px solid var(--c)}
+.dot.full{background:var(--c)}
+.sumlist .s{margin-left:auto;color:var(--muted);font-size:14px;text-align:right}
+.teacher p{max-width:68ch}
+.teacher textarea{min-height:320px;font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* Feier */
+.burst{position:relative;height:0}
+.burst i{position:absolute;top:-6px;width:9px;height:14px;border-radius:2px;opacity:0;animation:pop 1.1s ease-out forwards}
+@keyframes pop{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--x),var(--y)) rotate(var(--r))}}
+
+/* Mobile Leiste unten */
+.bottomnav{display:none}
+
+@media (max-width:640px){
+  :root{--navh:64px}
+  body{font-size:16.5px}
+  .appbar-in{padding:8px 16px}
+  .nav{display:none}
+  .wrap{padding:14px 14px calc(var(--navh) + env(safe-area-inset-bottom,0px) + 28px)}
+  .hero h1{font-size:32px;margin:2px 0 6px}
+  .lede{font-size:15px}
+  .hero.compact .lede{display:none}
+  .tabs{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory;margin:14px -14px 0;padding:2px 14px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{scroll-snap-align:start;max-width:78vw}
+  .stage{margin-top:12px;padding:14px 12px 10px;border-radius:18px}
+  .stairs{height:150px;gap:5px}
+  .step{padding:6px 4px;border-radius:9px 9px 3px 3px;align-items:center;justify-content:flex-end}
+  .step .nm,.step .st{display:none}
+  .step .n{font-size:22px}
+  .step .chk{top:5px;right:auto;left:50%;transform:translateX(-50%);width:18px;height:18px;font-size:11px}
+  .zones{font-size:13px}
+  .panel{margin-top:20px}
+  .lvlhead{padding:14px 16px;border-radius:16px}
+  .task{padding:16px;border-radius:16px}
+  .task .q{font-size:17px}
+  .assign{grid-template-columns:1fr 1fr;gap:8px}
+  .assign label{padding:10px}
+  .assign .f{font-size:20px}
+  .row .btn{flex:1 1 auto}
+  .numrow input{flex:1;width:auto;min-width:0}
+  .numrow .btn{flex:none}
+  .jump .btn{width:100%}
+  .choices{grid-template-columns:1fr}
+  .tcards{grid-template-columns:1fr}
+  .bottomnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;height:calc(var(--navh) + env(safe-area-inset-bottom,0px));padding:0 8px env(safe-area-inset-bottom,0px);
+    background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+  .bottomnav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer}
+  .bottomnav svg{width:24px;height:24px}
+  .bottomnav button[aria-current="page"]{color:var(--ink)}
+  .bottomnav button[aria-current="page"] svg{stroke-width:2.4}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+  .step:hover,.step.current{transform:none}
+}
+</style>
+</head>
+<body>
+<header class="appbar"><div class="appbar-in">
+  <button class="brand" data-act="home" aria-label="Bloom-Treppe, zur Startseite"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="20" width="6" height="10" rx="1.5" fill="#D7263D"/><rect x="9" y="15" width="6" height="15" rx="1.5" fill="#EE7B22"/><rect x="16" y="10" width="6" height="20" rx="1.5" fill="#2F9A55"/><rect x="23" y="4" width="7" height="26" rx="1.5" fill="#6B3FA0"/></svg><span>Bloom-Treppe</span></button>
+  <nav class="nav" aria-label="Ansichten">
+    <button data-act="home" data-nav="home">Lernen</button>
+    <button data-act="summary" data-nav="summary">Mein Fortschritt</button>
+    <button data-act="teacher" data-nav="teacher">Für Lehrkräfte</button>
+  </nav>
+</div></header>
+<div class="wrap">
+  <section class="hero" id="hero"><h1 id="title">Säure-Base-Chemie</h1><p class="lede" id="subtitle"></p></section>
+  <div class="tabs" id="tabs" aria-label="Themen"></div>
+  <div class="stage">
+    <div class="stairs" id="stairs" role="list" aria-label="Die Stufen des Themas"></div>
+    <div class="floor"></div>
+    <div class="zones" id="zones"></div>
+  </div>
+  <main class="panel" id="panel" aria-live="polite"></main>
+</div>
+<nav class="bottomnav" aria-label="Ansichten">
+  <button data-act="home" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4v-4h4v-4h4V8h4"/><path d="M4 20h16"/></svg><span>Lernen</span></button>
+  <button data-act="summary" data-nav="summary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.5l2.4 2.4 4.6-5"/></svg><span>Fortschritt</span></button>
+  <button data-act="teacher" data-nav="teacher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-4 9 4-9 4-9-4z"/><path d="M7 11v4.5c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5V11"/><path d="M21 9v5"/></svg><span>Lehrkräfte</span></button>
+</nav>
+<script>
+const TITRATION_SVG = "<svg viewBox=\"0 0 360 258\" role=\"img\" aria-label=\"Zwei Titrationskurven: Kurve A beginnt bei pH 1 und springt bei 20 mL steil auf etwa pH 11. Kurve B beginnt bei etwa pH 3, steigt flach an und springt bei 20 mL von etwa pH 7 auf 11; am \u00c4quivalenzpunkt liegt sie \u00fcber pH 7.\" xmlns=\"http://www.w3.org/2000/svg\"><line x1=\"40\" y1=\"220.0\" x2=\"340\" y2=\"220.0\" style=\"stroke:var(--line)\" stroke-width=\"1\" /><text x=\"32\" y=\"224.0\" text-anchor=\"end\" style=\"fill:var(--muted)\" font-size=\"11\">0</text><line x1=\"40\" y1=\"120.0\" x2=\"340\" y2=\"120.0\" style=\"stroke:var(--line)\" stroke-width=\"1\" stroke-dasharray=\"4 4\"/><text x=\"32\" y=\"124.0\" text-anchor=\"end\" style=\"fill:var(--muted)\" font-size=\"11\">7</text><line x1=\"40\" y1=\"20.0\" x2=\"340\" y2=\"20.0\" style=\"stroke:var(--line)\" stroke-width=\"1\" /><text x=\"32\" y=\"24.0\" text-anchor=\"end\" style=\"fill:var(--muted)\" font-size=\"11\">14</text><text x=\"40.0\" y=\"236\" text-anchor=\"middle\" style=\"fill:var(--muted)\" font-size=\"11\">0</text><text x=\"115.0\" y=\"236\" text-anchor=\"middle\" style=\"fill:var(--muted)\" font-size=\"11\">10</text><text x=\"190.0\" y=\"236\" text-anchor=\"middle\" style=\"fill:var(--muted)\" font-size=\"11\">20</text><text x=\"265.0\" y=\"236\" text-anchor=\"middle\" style=\"fill:var(--muted)\" font-size=\"11\">30</text><text x=\"340.0\" y=\"236\" text-anchor=\"middle\" style=\"fill:var(--muted)\" font-size=\"11\">40</text><line x1=\"40\" y1=\"20\" x2=\"40\" y2=\"220\" style=\"stroke:var(--muted)\"/><line x1=\"40\" y1=\"220\" x2=\"340\" y2=\"220\" style=\"stroke:var(--muted)\"/><text x=\"46\" y=\"14\" style=\"fill:var(--muted)\" font-size=\"11\">pH</text><text x=\"340\" y=\"254\" text-anchor=\"end\" style=\"fill:var(--muted)\" font-size=\"11\">V(Natronlauge) in mL</text><path d=\"M40.0,205.7 L41.9,205.6 L43.8,205.4 L45.6,205.2 L47.5,205.1 L49.4,204.9 L51.2,204.8 L53.1,204.6 L55.0,204.5 L56.9,204.3 L58.8,204.2 L60.6,204.0 L62.5,203.8 L64.4,203.7 L66.2,203.5 L68.1,203.4 L70.0,203.2 L71.9,203.0 L73.8,202.9 L75.6,202.7 L77.5,202.5 L79.4,202.4 L81.2,202.2 L83.1,202.0 L85.0,201.9 L86.9,201.7 L88.8,201.5 L90.6,201.4 L92.5,201.2 L94.4,201.0 L96.2,200.8 L98.1,200.6 L100.0,200.5 L101.9,200.3 L103.8,200.1 L105.6,199.9 L107.5,199.7 L109.4,199.5 L111.2,199.3 L113.1,199.1 L115.0,198.9 L116.9,198.7 L118.8,198.5 L120.6,198.3 L122.5,198.0 L124.4,197.8 L126.2,197.6 L128.1,197.4 L130.0,197.1 L131.9,196.9 L133.8,196.6 L135.6,196.4 L137.5,196.1 L139.4,195.8 L141.2,195.5 L143.1,195.3 L145.0,195.0 L146.9,194.6 L148.8,194.3 L150.6,194.0 L152.5,193.6 L154.4,193.3 L156.2,192.9 L158.1,192.5 L160.0,192.1 L161.9,191.6 L163.8,191.2 L165.6,190.7 L167.5,190.1 L169.4,189.5 L171.2,188.9 L173.1,188.2 L175.0,187.4 L176.9,186.6 L178.8,185.6 L180.6,184.4 L182.5,183.0 L184.4,181.2 L186.2,178.6 L188.1,174.3 L190.0,120.0 L191.9,65.8 L193.8,61.5 L195.6,59.1 L197.5,57.3 L199.4,56.0 L201.2,54.9 L203.1,54.0 L205.0,53.2 L206.9,52.5 L208.8,51.9 L210.6,51.3 L212.5,50.8 L214.4,50.3 L216.2,49.9 L218.1,49.5 L220.0,49.2 L221.9,48.8 L223.8,48.5 L225.6,48.2 L227.5,47.9 L229.4,47.6 L231.2,47.4 L233.1,47.2 L235.0,46.9 L236.9,46.7 L238.8,46.5 L240.6,46.3 L242.5,46.1 L244.4,45.9 L246.2,45.7 L248.1,45.6 L250.0,45.4 L251.9,45.2 L253.8,45.1 L255.6,44.9 L257.5,44.8 L259.4,44.7 L261.2,44.5 L263.1,44.4 L265.0,44.3 L266.9,44.1 L268.8,44.0 L270.6,43.9 L272.5,43.8 L274.4,43.7 L276.2,43.6 L278.1,43.5 L280.0,43.4 L281.9,43.3 L283.8,43.2 L285.6,43.1 L287.5,43.0 L289.4,42.9 L291.2,42.8 L293.1,42.7 L295.0,42.7 L296.9,42.6 L298.8,42.5 L300.6,42.4 L302.5,42.3 L304.4,42.3 L306.2,42.2 L308.1,42.1 L310.0,42.1 L311.9,42.0 L313.8,41.9 L315.6,41.9 L317.5,41.8 L319.4,41.7 L321.2,41.7 L323.1,41.6 L325.0,41.5 L326.9,41.5 L328.8,41.4 L330.6,41.4 L332.5,41.3 L334.4,41.3 L336.2,41.2 L338.1,41.2 L340.0,41.1\" fill=\"none\" style=\"stroke:var(--ink)\" stroke-width=\"2.2\"/><path d=\"M40.0,178.9 L41.9,176.1 L43.8,173.6 L45.6,171.7 L47.5,170.1 L49.4,168.7 L51.2,167.6 L53.1,166.6 L55.0,165.7 L56.9,164.9 L58.8,164.2 L60.6,163.5 L62.5,162.9 L64.4,162.3 L66.2,161.8 L68.1,161.3 L70.0,160.8 L71.9,160.3 L73.8,159.9 L75.6,159.4 L77.5,159.0 L79.4,158.6 L81.2,158.2 L83.1,157.8 L85.0,157.5 L86.9,157.1 L88.8,156.7 L90.6,156.4 L92.5,156.0 L94.4,155.7 L96.2,155.4 L98.1,155.0 L100.0,154.7 L101.9,154.4 L103.8,154.1 L105.6,153.8 L107.5,153.5 L109.4,153.1 L111.2,152.8 L113.1,152.5 L115.0,152.2 L116.9,151.9 L118.8,151.6 L120.6,151.3 L122.5,151.0 L124.4,150.7 L126.2,150.3 L128.1,150.0 L130.0,149.7 L131.9,149.4 L133.8,149.0 L135.6,148.7 L137.5,148.4 L139.4,148.0 L141.2,147.7 L143.1,147.3 L145.0,147.0 L146.9,146.6 L148.8,146.2 L150.6,145.8 L152.5,145.4 L154.4,145.0 L156.2,144.5 L158.1,144.1 L160.0,143.6 L161.9,143.1 L163.8,142.6 L165.6,142.0 L167.5,141.5 L169.4,140.8 L171.2,140.1 L173.1,139.4 L175.0,138.6 L176.9,137.7 L178.8,136.6 L180.6,135.4 L182.5,133.9 L184.4,132.1 L186.2,129.5 L188.1,125.1 L190.0,95.4 L191.9,65.8 L193.8,61.5 L195.6,59.1 L197.5,57.3 L199.4,56.0 L201.2,54.9 L203.1,54.0 L205.0,53.2 L206.9,52.5 L208.8,51.9 L210.6,51.3 L212.5,50.8 L214.4,50.3 L216.2,49.9 L218.1,49.5 L220.0,49.2 L221.9,48.8 L223.8,48.5 L225.6,48.2 L227.5,47.9 L229.4,47.6 L231.2,47.4 L233.1,47.2 L235.0,46.9 L236.9,46.7 L238.8,46.5 L240.6,46.3 L242.5,46.1 L244.4,45.9 L246.2,45.7 L248.1,45.6 L250.0,45.4 L251.9,45.2 L253.8,45.1 L255.6,44.9 L257.5,44.8 L259.4,44.7 L261.2,44.5 L263.1,44.4 L265.0,44.3 L266.9,44.1 L268.8,44.0 L270.6,43.9 L272.5,43.8 L274.4,43.7 L276.2,43.6 L278.1,43.5 L280.0,43.4 L281.9,43.3 L283.8,43.2 L285.6,43.1 L287.5,43.0 L289.4,42.9 L291.2,42.8 L293.1,42.7 L295.0,42.7 L296.9,42.6 L298.8,42.5 L300.6,42.4 L302.5,42.3 L304.4,42.3 L306.2,42.2 L308.1,42.1 L310.0,42.1 L311.9,42.0 L313.8,41.9 L315.6,41.9 L317.5,41.8 L319.4,41.7 L321.2,41.7 L323.1,41.6 L325.0,41.5 L326.9,41.5 L328.8,41.4 L330.6,41.4 L332.5,41.3 L334.4,41.3 L336.2,41.2 L338.1,41.2 L340.0,41.1\" fill=\"none\" style=\"stroke:var(--ink)\" stroke-width=\"2.2\" stroke-dasharray=\"6 4\"/><text x=\"150\" y=\"209.1\" style=\"fill:var(--ink)\" font-size=\"13\" font-weight=\"700\">A</text><text x=\"150\" y=\"136.9\" style=\"fill:var(--ink)\" font-size=\"13\" font-weight=\"700\">B</text></svg>";
+const ROLES = ["Säure","Base","konjugierte Säure","konjugierte Base"];
+const DEFAULT_CONTENT = {
+  title: "Säure-Base-Chemie",
+  subtitle: "Fünf Themen, jedes als Treppe. Die Stufen 1 bis 3 sind die Basis, die alle schaffen sollen. Ab Stufe 4 entscheidest du, wie weit du gehst.",
+  fundamentum: 3,
+  topics: [
+  { name:"Brønsted und Lowry", pages:"S. 104–105",
+    levels:[
+    { name:"Erinnern", desc:"Begriffe und Formeln abrufen.",
+      jump:{type:"mc", q:"Was ist eine Base nach Brønsted?", options:["ein Protonenakzeptor","ein Protonendonator","jeder Stoff, der OH⁻ enthält","ein Stoff mit pH < 7"], correct:0,
+            explain:"Basen nehmen Protonen (H⁺) auf, Säuren geben sie ab."},
+      tasks:[
+        {type:"mc", q:"Säuren sind nach Brønsted …", options:["Protonendonatoren","Protonenakzeptoren","Elektronenakzeptoren","Hydroxid-Ionen-Spender"], correct:0,
+         hints:["„Donator“ heißt Spender: Wer spendet, gibt etwas ab.","Eine Säure gibt ein H⁺-Teilchen ab."],
+         explain:"Säuren geben Protonen (H⁺) ab, sie sind Protonendonatoren."},
+        {type:"mc", q:"Welcher Name gehört zur Formel HNO₃?", options:["Salpetersäure","Salzsäure","Schweflige Säure","Phosphorsäure"], correct:0,
+         hints:["Schau in die Tabelle auf S. 104.","N steht für Stickstoff. Salzsäure ist HCl."],
+         explain:"HNO₃ ist Salpetersäure. Salzsäure ist HCl, Schweflige Säure H₂SO₃, Phosphorsäure H₃PO₄."},
+        {type:"mc", q:"Welches Teilchen kann nach Brønsted als Base wirken?", options:["NH₃","HCl","CH₄","H₂SO₄"], correct:0,
+         hints:["Eine Base braucht etwas, womit sie ein H⁺ festhalten kann.","Gesucht ist ein Teilchen mit freiem Elektronenpaar."],
+         explain:"Ammoniak hat am Stickstoff ein freies Elektronenpaar, an das ein Proton binden kann."}
+      ]},
+    { name:"Verstehen", desc:"Erklären, was bei einer Säure-Base-Reaktion passiert.",
+      jump:{type:"mc", q:"HA + B ⇌ A⁻ + BH⁺\nWelches Teilchen ist die konjugierte Säure?", options:["BH⁺","A⁻","HA","B"], correct:0,
+            explain:"Die Base B nimmt ein Proton auf und wird zu BH⁺. BH⁺ kann das Proton wieder abgeben, ist also die konjugierte Säure."},
+      tasks:[
+        {type:"mc", q:"Was passiert bei jeder Säure-Base-Reaktion nach Brønsted?", options:["Ein Proton wird von der Säure auf die Base übertragen.","Elektronen werden von der Base auf die Säure übertragen.","Es entstehen immer Wasser und ein Salz.","Die Base gibt Hydroxid-Ionen ab."], correct:0,
+         hints:["Säure-Base-Reaktionen heißen auch Protolysen."],
+         explain:"Kern jeder Brønsted-Reaktion ist die Protonenübertragung. Wasser und Salz entstehen nur im Sonderfall der Neutralisation."},
+        {type:"mc", q:"Warum kann der Säurerest A⁻ wieder als Base reagieren?", options:["Er kann wieder ein Proton aufnehmen und so zu HA werden.","Er ist negativ geladen und gibt deshalb Elektronen ab.","Er enthält noch Wasserstoff.","Säurereste sind immer starke Basen."], correct:0,
+         hints:["Schau dir die Rückreaktion an: A⁻ + BH⁺ → ?"],
+         explain:"Die Reaktion ist umkehrbar: A⁻ nimmt in der Rückreaktion ein Proton auf. Darum ist A⁻ die konjugierte Base von HA."},
+        {type:"mc", q:"Die beiden Teilchen eines konjugierten Säure-Base-Paares unterscheiden sich um …", options:["genau ein Proton","genau ein Elektron","ein Wassermolekül","ein Hydroxid-Ion"], correct:0,
+         hints:["Vergleiche HA und A⁻: Was fehlt A⁻?"],
+         explain:"HA und A⁻ (oder B und BH⁺) unterscheiden sich um genau ein H⁺."}
+      ]},
+    { name:"Anwenden", desc:"Reaktionsgleichungen beschriften und Paare finden.",
+      jump:{type:"assign", q:"Ordne jedem Teilchen seine Rolle zu.", eq:"HCl + NH₃ ⇌ Cl⁻ + NH₄⁺", choices:ROLES,
+            items:[{text:"HCl",answer:0},{text:"NH₃",answer:1},{text:"Cl⁻",answer:3},{text:"NH₄⁺",answer:2}],
+            explain:"HCl gibt ein Proton an NH₃ ab. Aus HCl wird Cl⁻ (konjugierte Base), aus NH₃ wird NH₄⁺ (konjugierte Säure)."},
+      tasks:[
+        {type:"assign", q:"Salpetersäure reagiert mit Ammoniak. Beschrifte die Gleichung.", eq:"HNO₃ + NH₃ ⇌ NO₃⁻ + NH₄⁺", choices:ROLES,
+         items:[{text:"HNO₃",answer:0},{text:"NH₃",answer:1},{text:"NO₃⁻",answer:3},{text:"NH₄⁺",answer:2}],
+         hints:["Wer verliert ein H? Das ist die Säure.","Die konjugierte Base ist das, was aus der Säure wird."],
+         explain:"HNO₃ gibt ein Proton ab und wird zu NO₃⁻. NH₃ nimmt es auf und wird zu NH₄⁺."},
+        {type:"mc", q:"Welche Formel hat die konjugierte Base von Flusssäure (HF)?", options:["F⁻","H₂F⁺","HF⁻","F₂"], correct:0,
+         hints:["Konjugierte Base: ein H⁺ weniger. Achte auf die Ladung."],
+         explain:"HF gibt ein H⁺ ab: übrig bleibt F⁻."},
+        {type:"assign", q:"Blausäure reagiert mit Carbonat. Beschrifte die Gleichung.", eq:"HCN + CO₃²⁻ ⇌ CN⁻ + HCO₃⁻", choices:ROLES,
+         items:[{text:"HCN",answer:0},{text:"CO₃²⁻",answer:1},{text:"CN⁻",answer:3},{text:"HCO₃⁻",answer:2}],
+         hints:["Carbonat steht auf S. 104 bei den Basen.","Vergleiche jeweils links und rechts: Wo kommt ein H dazu, wo geht eines weg?"],
+         explain:"HCN gibt ein Proton an CO₃²⁻ ab. Paare: HCN/CN⁻ und HCO₃⁻/CO₃²⁻."}
+      ]},
+    { name:"Analysieren", desc:"Aussagen und Definitionen auseinandernehmen.",
+      tasks:[
+        {type:"mc", q:"Ein Mitschüler sagt: „NaOH ist eine Base, weil es OH enthält. Ammoniak enthält kein OH, also ist es keine Base.“\nWelche Analyse trifft zu?",
+         options:["Er denkt in der älteren Vorstellung „Base = OH-Lieferant“. Nach Brønsted zählt nur, ob ein Teilchen ein Proton aufnimmt.","Er hat recht: Ammoniak ist nur in Wasser eine Base.","Er hat recht, weil NaOH die stärkere Base ist.","Beide Stoffe sind keine Basen, weil sie keine Protonen abgeben."], correct:0,
+         explain:"Ammoniak nimmt mit seinem freien Elektronenpaar ein Proton auf und ist deshalb eine Brønsted-Base, auch ohne OH. Bei NaOH ist streng genommen das OH⁻-Ion die Base."},
+        {type:"open", minChars:100,
+         q:"Methan (CH₄) hat vier Wasserstoffatome und ist trotzdem keine Säure. Chlorwasserstoff (HCl) hat nur eines und ist eine starke Säure.\nAnalysiere, woran das liegt.",
+         criteria:["Ich vergleiche die Bindungen: C–H ist kaum polar, H–Cl stark polar (Elektronegativität).","Ich erkläre, dass das H als H⁺ abgespalten werden muss und was dabei zurückbleibt.","Ich gehe darauf ein, wie gut das zurückbleibende Teilchen (Cl⁻ bzw. CH₃⁻) die negative Ladung trägt.","Ich folgere: „enthält Wasserstoff“ ist notwendig, aber nicht ausreichend."],
+         sample:"In HCl ist die Bindung stark polar, weil Chlor viel elektronegativer ist als Wasserstoff. Das H ist positiv polarisiert und lässt sich leicht als Proton abspalten; zurück bleibt Cl⁻, ein stabiles Ion. In CH₄ ist die C–H-Bindung kaum polar. Ein abgespaltenes Proton würde ein sehr instabiles CH₃⁻ hinterlassen, daher passiert das in Wasser praktisch nicht.\nFolgerung: Jede Säure enthält Wasserstoff, aber nicht jeder Stoff mit Wasserstoff ist eine Säure."}
+      ]},
+    { name:"Bewerten", desc:"Begründet urteilen.",
+      tasks:[
+        {type:"open", minChars:120,
+         q:"Im Unterricht hieß es: „Eine Säure enthält mindestens ein Wasserstoffatom, eine Base besitzt ein freies Elektronenpaar.“\nBewerte, wie gut sich Säuren und Basen mit diesen Merkmalen erkennen lassen. Wo helfen sie, wo greifen sie zu kurz?",
+         criteria:["Ich unterscheide notwendige und hinreichende Merkmale.","Ich nenne Gegenbeispiele (z. B. CH₄ hat H und ist keine Säure; H₂O hat freie Elektronenpaare und kann trotzdem Säure sein).","Ich würdige den Nutzen als Merkhilfe.","Ich formuliere ein Urteil und einen Verbesserungsvorschlag."],
+         sample:"Beide Merkmale sind notwendig, aber nicht hinreichend. Ohne H kann ein Teilchen kein Proton abgeben, aber nicht jedes H ist abspaltbar (CH₄). Ohne freies Elektronenpaar kann ein Teilchen kein Proton binden, aber viele Teilchen mit freien Elektronenpaaren reagieren je nach Partner als Säure (H₂O mit NH₃).\nUrteil: Als Merkhilfe brauchbar, um Kandidaten zu erkennen. Ob ein Teilchen Säure oder Base ist, entscheidet sich aber erst in der konkreten Reaktion. Besser: „Säure ist, was in dieser Reaktion ein Proton abgibt.“"}
+      ]},
+    { name:"Erschaffen", desc:"Ein eigenes Modell entwickeln.",
+      tasks:[
+        {type:"open", minChars:150,
+         q:"Erfinde eine Analogie oder ein kleines Rollenspiel (z. B. ein Ballspiel), mit dem jüngere Schüler:innen die Brønsted-Definition samt konjugierten Säure-Base-Paaren verstehen.\nBeschreibe dein Modell und prüfe am Ende: Wo hinkt es?",
+         criteria:["Das Proton ist klar durch einen Gegenstand dargestellt.","Säure, Base und die konjugierten Partner nach der Übergabe kommen vor.","Die Rückreaktion (Gleichgewicht) ist abgebildet.","Ich benenne mindestens eine Grenze meines Modells."],
+         sample:"Zwei Personen und ein Tennisball (Proton). Person A hält den Ball: Säure. Person B hat eine freie Hand (freies Elektronenpaar): Base. A wirft den Ball zu B. Jetzt hat B den Ball und ist die konjugierte Säure, A ist mit leeren Händen die konjugierte Base. B kann den Ball zurückwerfen: Rückreaktion. Viele Paare spielen gleichzeitig hin und her: Gleichgewicht.\nGrenzen: Ein Proton wird nicht „geworfen“, sondern direkt übergeben; die Ladungsänderung der Teilchen fehlt im Modell; wie gerne jemand den Ball abgibt (Säurestärke), zeigt das Modell nicht."}
+      ]}
+    ]},
+
+  { name:"Wasser und mehrwertige Säuren", pages:"S. 105–106",
+    levels:[
+    { name:"Erinnern", desc:"Begriffe rund ums Wasser abrufen.",
+      jump:{type:"mc", q:"Wie nennt man ein Teilchen, das sowohl als Säure als auch als Base reagieren kann?", options:["Ampholyt","Elektrolyt","Indikator","Puffer"], correct:0,
+            explain:"Ampholyte wie Wasser können je nach Reaktionspartner Protonen abgeben oder aufnehmen."},
+      tasks:[
+        {type:"mc", q:"Wie heißt das Ion H₃O⁺?", options:["Oxonium-Ion","Hydroxid-Ion","Ammonium-Ion","Hydrid-Ion"], correct:0,
+         hints:["OH⁻ ist das Hydroxid-Ion."],
+         explain:"H₃O⁺ ist das Oxonium-Ion, OH⁻ das Hydroxid-Ion."},
+        {type:"mc", q:"Welche dieser Säuren ist mehrwertig?", options:["H₃PO₄","HCl","HF","HNO₃"], correct:0,
+         hints:["Zähle die Wasserstoffatome am Anfang der Formel."],
+         explain:"Phosphorsäure hat drei abspaltbare H-Atome und kann dreimal deprotoniert werden."}
+      ]},
+    { name:"Verstehen", desc:"Erklären, warum Wasser mal Säure, mal Base ist.",
+      jump:{type:"mc", q:"H₂O + H₂O ⇌ H₃O⁺ + OH⁻\nWas beschreibt diese Autoprotolyse?", options:["Ein Wassermolekül gibt ein Proton an ein anderes ab.","Wasser zerfällt in Wasserstoff und Sauerstoff.","Ein Wassermolekül nimmt ein Elektron auf.","Wasser reagiert mit dem Sauerstoff der Luft."], correct:0,
+            explain:"Bei der Autoprotolyse ist ein Wassermolekül Säure, das andere Base."},
+      tasks:[
+        {type:"mc", q:"Wasser reagiert mit Chlorwasserstoff (HCl). Welche Rolle übernimmt das Wasser?", options:["Base (Protonenakzeptor)","Säure (Protonendonator)","weder noch, es ist nur Lösungsmittel","beides gleichzeitig"], correct:0,
+         hints:["HCl ist eine starke Säure. Wer nimmt ihr Proton?"],
+         explain:"HCl + H₂O → Cl⁻ + H₃O⁺: Wasser nimmt das Proton auf."},
+        {type:"mc", q:"Wasser reagiert mit Ammoniak (NH₃). Welche Rolle übernimmt das Wasser?", options:["Säure (Protonendonator)","Base (Protonenakzeptor)","weder noch, es ist nur Lösungsmittel","beides gleichzeitig"], correct:0,
+         hints:["Ammoniak ist eine Base. Was braucht eine Base von ihrem Partner?"],
+         explain:"NH₃ + H₂O ⇌ NH₄⁺ + OH⁻: Wasser gibt ein Proton ab."},
+        {type:"mc", q:"Warum kann Schwefelsäure zweimal deprotoniert werden, Salpetersäure nur einmal?", options:["H₂SO₄ hat zwei abspaltbare H-Atome, HNO₃ nur eines.","Schwefelsäure ist die stärkere Säure.","Schwefel ist schwerer als Stickstoff.","Salpetersäure reagiert nicht mit Wasser."], correct:0,
+         hints:["Vergleiche die Formeln: H₂SO₄ und HNO₃."],
+         explain:"Die Anzahl abspaltbarer H-Atome bestimmt die Wertigkeit, nicht die Stärke."}
+      ]},
+    { name:"Anwenden", desc:"Gleichungen mit Wasser aufstellen und beschriften.",
+      jump:{type:"assign", q:"Ammoniak reagiert mit Wasser. Ordne zu.", eq:"NH₃ + H₂O ⇌ NH₄⁺ + OH⁻", choices:ROLES,
+            items:[{text:"NH₃",answer:1},{text:"H₂O",answer:0},{text:"NH₄⁺",answer:2},{text:"OH⁻",answer:3}],
+            explain:"Hier ist Wasser die Säure. Paare: NH₄⁺/NH₃ und H₂O/OH⁻."},
+      tasks:[
+        {type:"assign", q:"Schwefelsäure reagiert mit Wasser. Beschrifte die Gleichung.", eq:"H₂SO₄ + H₂O ⇌ HSO₄⁻ + H₃O⁺", choices:ROLES,
+         items:[{text:"H₂SO₄",answer:0},{text:"H₂O",answer:1},{text:"HSO₄⁻",answer:3},{text:"H₃O⁺",answer:2}],
+         hints:["Mit einer Säure reagiert Wasser als …?","Aus H₂O wird durch Aufnahme eines Protons H₃O⁺."],
+         explain:"Paare: H₂SO₄/HSO₄⁻ und H₃O⁺/H₂O."},
+        {type:"mc", q:"Welche Gleichung beschreibt die zweite Protolysestufe der Schwefelsäure?", options:["HSO₄⁻ + H₂O ⇌ SO₄²⁻ + H₃O⁺","H₂SO₄ + H₂O ⇌ SO₄²⁻ + H₃O⁺","HSO₄⁻ + H₂O ⇌ H₂SO₄ + OH⁻","SO₄²⁻ + H₂O ⇌ HSO₄⁻ + OH⁻"], correct:0,
+         hints:["Stufe 2 startet mit dem Produkt aus Stufe 1.","Prüfe bei jeder Gleichung, ob H-Atome und Ladungen ausgeglichen sind."],
+         explain:"Das Hydrogensulfat-Ion gibt sein zweites Proton ab. Die zweite Gleichung ist nicht ausgeglichen, die dritte und vierte zeigen Reaktionen als Base."},
+        {type:"num", q:"H₃PO₄ → H₂PO₄⁻ → HPO₄²⁻ → PO₄³⁻\nWie viele Teilchen dieser Kette sind Ampholyte?", unit:"", answer:2, tol:0,
+         hints:["Ein Ampholyt muss ein Proton abgeben und eines aufnehmen können.","Kann PO₄³⁻ noch ein Proton abgeben?"],
+         explain:"H₂PO₄⁻ und HPO₄²⁻ können beides. H₃PO₄ reagiert in Wasser nur als Säure, PO₄³⁻ nur als Base."}
+      ]},
+    { name:"Analysieren", desc:"Rollen in verschiedenen Reaktionen vergleichen.",
+      tasks:[
+        {type:"mc", q:"In welcher Reaktion wirkt das Hydrogencarbonat-Ion (HCO₃⁻) als Säure?", options:["HCO₃⁻ + OH⁻ ⇌ CO₃²⁻ + H₂O","HCO₃⁻ + H₃O⁺ ⇌ H₂CO₃ + H₂O","HCO₃⁻ + HCl ⇌ H₂CO₃ + Cl⁻","In keiner, HCO₃⁻ ist immer eine Base."], correct:0,
+         explain:"Gegenüber OH⁻ gibt HCO₃⁻ ein Proton ab. Gegenüber Säuren nimmt es eines auf. HCO₃⁻ ist ein Ampholyt, wichtig für den Blutpuffer."},
+        {type:"open", minChars:100,
+         q:"Reines Wasser leitet den elektrischen Strom sehr schwach, aber messbar.\nAnalysiere, wie das mit der Autoprotolyse zusammenhängt und was die schwache Leitfähigkeit über die Lage des Gleichgewichts verrät.",
+         criteria:["Ich erkläre, dass durch Autoprotolyse Ionen (H₃O⁺ und OH⁻) entstehen.","Ich verbinde frei bewegliche Ionen mit elektrischer Leitfähigkeit.","Ich folgere, dass das Gleichgewicht weit auf der Seite der Wassermoleküle liegt.","Ich nenne eine Größenordnung (c = 10⁻⁷ mol/L bei 25 °C)."],
+         sample:"Durch die Autoprotolyse entstehen H₃O⁺- und OH⁻-Ionen, die als Ladungsträger den Strom leiten. Dass die Leitfähigkeit sehr gering ist, zeigt: Es gibt nur wenige Ionen. Bei 25 °C beträgt c(H₃O⁺) = c(OH⁻) = 10⁻⁷ mol/L, also nur etwa eines von 500 Millionen Wassermolekülen ist protolysiert. Das Gleichgewicht liegt weit links."}
+      ]},
+    { name:"Bewerten", desc:"Eine Formulierung prüfen und verbessern.",
+      tasks:[
+        {type:"open", minChars:100,
+         q:"Im Heft steht: „Wasser ist neutral.“ Eine Mitschülerin widerspricht: Wasser bilde doch H₃O⁺ und OH⁻, also könne es nicht neutral sein.\nBeurteile, wer recht hat, und schlage eine präzisere Formulierung vor.",
+         criteria:["Ich erkläre, dass beide Ionen in gleicher Konzentration entstehen.","Ich definiere „neutral“ als c(H₃O⁺) = c(OH⁻), nicht als „keine Ionen“.","Ich unterscheide „Ampholyt“ von „sauer“ oder „basisch“.","Ich formuliere einen präziseren Satz."],
+         sample:"Die Aussage im Heft stimmt, der Einwand beruht auf einem Missverständnis. Bei der Autoprotolyse entsteht für jedes H₃O⁺ genau ein OH⁻. Neutral heißt nicht „ohne Ionen“, sondern: beide Konzentrationen sind gleich. Dass Wasser Säure und Base sein kann (Ampholyt), macht es nicht sauer oder basisch.\nPräziser: „In reinem Wasser sind Oxonium- und Hydroxid-Ionen gleich konzentriert; reines Wasser ist daher neutral (pH 7 bei 25 °C).“"}
+      ]},
+    { name:"Erschaffen", desc:"Eine eigene Übersicht mit Regel entwerfen.",
+      tasks:[
+        {type:"open", minChars:150,
+         q:"Entwirf eine Übersicht (Tabelle, Mindmap oder Flussdiagramm), mit der man für jedes Teilchen der Phosphorsäure-Kette (H₃PO₄ bis PO₄³⁻) erkennt, ob es Säure, Base oder Ampholyt ist.\nBeschreibe deine Übersicht und leite eine allgemeine Regel ab, die auch für Schwefelsäure und Kohlensäure gilt.",
+         criteria:["Alle vier Teilchen der Kette kommen vor.","Die Einordnung stimmt (H₃PO₄ Säure, H₂PO₄⁻ und HPO₄²⁻ Ampholyte, PO₄³⁻ Base).","Ich formuliere eine allgemeine Regel.","Ich prüfe die Regel an einem zweiten Beispiel."],
+         sample:"Tabelle mit den Spalten Teilchen, kann H⁺ abgeben?, kann H⁺ aufnehmen?, Rolle:\nH₃PO₄: ja, praktisch nein → Säure\nH₂PO₄⁻: ja, ja → Ampholyt\nHPO₄²⁻: ja, ja → Ampholyt\nPO₄³⁻: nein, ja → Base\nRegel: Bei einer n-wertigen Säure sind alle Zwischenstufen Ampholyte; nur die Ausgangssäure und das vollständig deprotonierte Anion sind es nicht.\nPrüfung: Schwefelsäure (zweiwertig) hat eine Zwischenstufe, HSO₄⁻. Kohlensäure hat HCO₃⁻."}
+      ]}
+    ]},
+
+  { name:"Stärke von Säuren und Basen", pages:"S. 107–108",
+    levels:[
+    { name:"Erinnern", desc:"Begriffe und Beispiele zur Säurestärke abrufen.",
+      jump:{type:"mc", q:"Wofür steht Ks?", options:["Säurekonstante","Konzentration der Säure","Kelvin-Wert einer Säure","Stärke der konjugierten Base"], correct:0,
+            explain:"Ks ist die Säurekonstante aus dem Massenwirkungsgesetz der Protolyse."},
+      tasks:[
+        {type:"mc", q:"Eine Säure ist stark, wenn sie …", options:["gerne Protonen abgibt","gerne Protonen aufnimmt","hoch konzentriert ist","viele Wasserstoffatome hat"], correct:0,
+         hints:["Stärke beschreibt eine Bereitschaft, nicht eine Menge."],
+         explain:"Stärke heißt: Wie bereitwillig gibt die Säure Protonen ab? Mit der Konzentration hat das nichts zu tun."},
+        {type:"mc", q:"Welche Säure zählt zu den starken Säuren?", options:["HNO₃","CH₃COOH","H₂CO₃","H₃PO₄"], correct:0,
+         hints:["Die Tabelle auf S. 108 teilt in starke und schwache Säuren ein."],
+         explain:"Salpetersäure ist stark, Essigsäure, Kohlensäure und Phosphorsäure sind schwächer."}
+      ]},
+    { name:"Verstehen", desc:"Ks, pKs und konjugierte Paare deuten.",
+      jump:{type:"mc", q:"Säure X hat pKs = 3, Säure Y hat pKs = 9. Welche Aussage stimmt?", options:["X ist die stärkere Säure.","Y ist die stärkere Säure.","Beide sind gleich stark.","Das hängt von der Konzentration ab."], correct:0,
+            explain:"Je kleiner der pKs-Wert, desto stärker die Säure."},
+      tasks:[
+        {type:"mc", q:"Warum ist die konjugierte Base einer starken Säure eine schwache Base?", options:["Weil die starke Säure ihr Proton gern abgibt, nimmt der Säurerest es kaum wieder auf.","Weil starke Säuren keine konjugierte Base haben.","Weil der Säurerest positiv geladen ist.","Weil konjugierte Basen immer schwach sind."], correct:0,
+         hints:["Denk an Hin- und Rückreaktion: Wenn die Hinreaktion sehr gern abläuft …"],
+         explain:"HCl gibt sein Proton fast vollständig ab; Cl⁻ holt es sich praktisch nicht zurück. Starke Säure ↔ schwache konjugierte Base."},
+        {type:"mc", q:"Warum verwendet man meist den pKs-Wert statt Ks?", options:["Ks-Werte reichen über viele Zehnerpotenzen und sind oft sehr klein; der Logarithmus macht sie handlich.","Der Logarithmus macht die Säure stärker.","Ohne pKs kann man keinen pH-Wert messen.","Ks ist immer größer als 1."], correct:0,
+         hints:["Vergleiche: Ks = 0,000018 oder pKs = 4,75. Was ist leichter zu lesen?"],
+         explain:"pKs = −log Ks macht aus 0,000018 die Zahl 4,75."},
+        {type:"mc", q:"Im Massenwirkungsgesetz für Ks taucht die Konzentration des Wassers nicht auf. Warum?", options:["Wasser liegt in riesigem Überschuss vor; seine Konzentration bleibt praktisch konstant und steckt in Ks.","Wasser nimmt an der Reaktion nicht teil.","Die Konzentration von Wasser ist null.","Weil Wasser neutral ist."], correct:0,
+         hints:["Schau auf S. 108: K wird mit c(H₂O) zusammengefasst."],
+         explain:"c(H₂O) ändert sich bei der Reaktion kaum (ca. 55 mol/L) und wird in die Konstante einbezogen."}
+      ]},
+    { name:"Anwenden", desc:"Mit Ks und pKs rechnen und einordnen.",
+      jump:{type:"num", q:"Eine Säure hat Ks = 10⁻⁵. Berechne den pKs-Wert.", unit:"", answer:5, tol:0.01,
+            explain:"pKs = −log(10⁻⁵) = 5."},
+      tasks:[
+        {type:"num", q:"Der pKs-Wert der Essigsäure beträgt 4,75. Berechne Ks.\nGib eine Dezimalzahl an (z. B. 0,0003) oder schreib 1,2e-4.", unit:"", answer:0.0000178, tol:0.0000015,
+         hints:["Ks = 10⁻ᵖᴷˢ","Taschenrechner: 10^(−4,75)"],
+         explain:"Ks = 10⁻⁴·⁷⁵ ≈ 0,000018 (1,8 · 10⁻⁵)."},
+        {type:"mc", q:"Ammoniak hat den pKb-Wert 4,75. Wie wird Ammoniak nach der Tabelle auf S. 108 eingeordnet?", options:["mittelstarke Base","sehr starke Base","starke Base","schwache Base"], correct:0,
+         hints:["Grenzen laut Tabelle: ≤ 0 sehr stark, 0 bis 4 stark, 4 bis 9 mittelstark, 9 bis 14 schwach."],
+         explain:"4 < 4,75 ≤ 9: mittelstarke Base."},
+        {type:"num", q:"Eine Säure hat Ks = 100. Berechne pKs.", unit:"", answer:-2, tol:0.01,
+         hints:["log(100) = 2. Achte auf das Minus."],
+         explain:"pKs = −log(100) = −2. Mit pKs ≤ 0 ist das eine sehr starke Säure."}
+      ]},
+    { name:"Analysieren", desc:"Stärke und Konzentration auseinanderhalten.",
+      tasks:[
+        {type:"mc", q:"Lösung A: Salzsäure, c = 0,001 mol/L.\nLösung B: Essigsäure, c = 1 mol/L (pKs = 4,75).\nWelche Aussage stimmt?", options:["B hat den niedrigeren pH-Wert, obwohl Essigsäure die schwächere Säure ist.","A hat den niedrigeren pH-Wert, weil Salzsäure stärker ist.","Beide haben denselben pH-Wert.","Ohne Messung lässt sich nichts sagen."], correct:0,
+         explain:"A: c(H₃O⁺) = 0,001 mol/L → pH 3. B: Nur ein kleiner Teil protolysiert, aber wegen der hohen Konzentration ergibt sich c(H₃O⁺) ≈ 0,004 mol/L → pH ≈ 2,4. Genau das meint S. 110: Die Stärke allein sagt nichts über den pH-Wert."},
+        {type:"open", minChars:100,
+         q:"Ammonium (NH₄⁺) hat pKs = 9,25, Ammoniak (NH₃) hat pKb = 4,75.\nAnalysiere den Zusammenhang zwischen der Stärke einer Säure und der Stärke ihrer konjugierten Base. Finde eine Gesetzmäßigkeit und prüfe sie an einem zweiten Paar.",
+         criteria:["Ich erkenne: pKs + pKb = 14 für ein konjugiertes Paar (25 °C).","Ich formuliere: Je stärker die Säure, desto schwächer ihre konjugierte Base.","Ich prüfe an einem zweiten Paar (z. B. Essigsäure 4,75 → Acetat 9,25).","Expertenpunkt: Ich begründe es mit Ks · Kb = Kw = 10⁻¹⁴."],
+         sample:"9,25 + 4,75 = 14. Für jedes konjugierte Paar gilt bei 25 °C pKs + pKb = 14. Ist die Säure stark (kleiner pKs), muss der pKb ihrer Base groß sein: Die Base ist schwach.\nPrüfung: Essigsäure pKs = 4,75 → Acetat pKb = 9,25.\nBegründung: Multipliziert man die Konstanten von HA + H₂O ⇌ A⁻ + H₃O⁺ und A⁻ + H₂O ⇌ HA + OH⁻, kürzen sich c(HA) und c(A⁻) weg, übrig bleibt c(H₃O⁺)·c(OH⁻) = Kw."}
+      ]},
+    { name:"Bewerten", desc:"Eine Säure für einen Zweck auswählen.",
+      tasks:[
+        {type:"open", minChars:120,
+         q:"Für einen Schülerversuch wird eine Säure gesucht, die Kalk (Calciumcarbonat) zuverlässig löst, aber möglichst ungefährlich ist.\nZur Wahl: Salzsäure (pKs ≈ −6), Zitronensäure (pKs₁ ≈ 3,1), Essigsäure (pKs = 4,75).\nBewerte die Optionen und triff eine Entscheidung.",
+         criteria:["Ich ordne die Säuren nach ihrer Stärke (pKs).","Ich beziehe Sicherheit und Handhabung ein.","Ich berücksichtige, dass auch die Konzentration die Wirkung bestimmt.","Ich treffe ein begründetes Urteil mit Einschränkung."],
+         sample:"Salzsäure ist sehr stark und löst Kalk am schnellsten, ist aber ätzend und gibt in höherer Konzentration stechende Dämpfe ab. Essigsäure ist am schwächsten und riecht stark, wirkt aber bei ausreichender Konzentration. Zitronensäure liegt dazwischen, ist als Pulver gut dosierbar, geruchsarm und lebensmittelverträglich.\nUrteil: Zitronensäure. Einschränkung: Wie schnell sich der Kalk löst, hängt auch von Konzentration und Temperatur ab; für einen fairen Vergleich müssen die Bedingungen gleich sein."}
+      ]},
+    { name:"Erschaffen", desc:"Ein Experiment entwerfen.",
+      tasks:[
+        {type:"open", minChars:150,
+         q:"Entwickle ein Experiment, mit dem man ohne pH-Meter zeigen kann, dass Salzsäure stärker ist als Essigsäure, und zwar bei gleicher Konzentration (c = 0,1 mol/L).\nBeschreibe Material, Durchführung, erwartetes Ergebnis und Sicherheitsmaßnahmen.",
+         criteria:["Mein Vergleich ist fair: gleiche Konzentration, gleiches Volumen, gleiche Temperatur.","Ich benenne eine Messgröße (z. B. Leitfähigkeit, Geschwindigkeit der Gasentwicklung mit Magnesium, Indikatorfarbe).","Ich begründe das Ergebnis mit vollständiger bzw. unvollständiger Protolyse.","Ich nenne passende Sicherheitsmaßnahmen.","Expertenpunkt: Ich erkenne, was bei meinem Versuch gleich bleibt und was sich unterscheidet."],
+         sample:"Zwei Bechergläser mit je 50 mL Säure (c = 0,1 mol/L), gleiche Temperatur. In jedes kommt ein gleich langes, blank geschmirgeltes Stück Magnesiumband; das Gas wird mit einem Kolbenprober aufgefangen und alle 15 s abgelesen.\nErwartung: Bei Salzsäure entsteht Wasserstoff deutlich schneller, weil sie vollständig protolysiert. Essigsäure protolysiert nur zu etwa 1 %.\nExpertenpunkt: Das Gesamtvolumen an Wasserstoff ist am Ende gleich, weil beide Lösungen gleich viele Säuremoleküle enthalten. Nur die Geschwindigkeit unterscheidet sich.\nSicherheit: Schutzbrille, kleine Mengen, keine offene Flamme."}
+      ]}
+    ]},
+
+  { name:"pH-Wert und pOH-Wert", pages:"S. 110–111",
+    levels:[
+    { name:"Erinnern", desc:"Skala und Messmethoden abrufen.",
+      jump:{type:"mc", q:"Was gilt bei 25 °C immer?", options:["pH + pOH = 14","pH + pOH = 7","pH − pOH = 0","pH · pOH = 14"], correct:0,
+            explain:"pH + pOH = 14 bei 25 °C."},
+      tasks:[
+        {type:"mc", q:"Eine Lösung hat pH 3. Sie ist …", options:["sauer","basisch","neutral"], correct:0,
+         hints:["pH < 7: sauer, pH > 7: basisch."],
+         explain:"pH 3 < 7: sauer."},
+        {type:"mc", q:"Eine Lösung hat pOH 3. Sie ist …", options:["basisch","sauer","neutral"], correct:0,
+         hints:["Beim pOH ist es umgekehrt wie beim pH.","pOH 3 entspricht pH 11."],
+         explain:"pOH 3 → pH = 14 − 3 = 11: basisch."},
+        {type:"mc", q:"Welche Methode misst den pH-Wert direkt?", options:["pH-Meter","Universalindikator","Rotkohlsaft","Lackmuspapier"], correct:0,
+         hints:["Indikatoren zeigen den pH-Wert über eine Farbe an, also indirekt."],
+         explain:"Das pH-Meter misst elektrisch; Indikatoren sind indirekte Methoden."}
+      ]},
+    { name:"Verstehen", desc:"Den Logarithmus hinter der Skala verstehen.",
+      jump:{type:"mc", q:"Der pH-Wert sinkt von 4 auf 3. Was passiert mit c(H₃O⁺)?", options:["Sie verzehnfacht sich.","Sie verdoppelt sich.","Sie steigt um 1 mol/L.","Sie halbiert sich."], correct:0,
+            explain:"Eine pH-Einheit entspricht dem Faktor 10."},
+      tasks:[
+        {type:"mc", q:"Warum sagt die Stärke einer Säure allein nichts über den pH-Wert einer Lösung aus?", options:["Der pH-Wert hängt auch von der Konzentration der Säure ab.","Starke Säuren haben immer pH 0.","Der pH-Wert misst nur Basen.","Die Stärke ändert sich mit der Temperatur."], correct:0,
+         hints:["Schau auf S. 110: Was ist neben der Stärke noch wichtig?"],
+         explain:"Eine stark verdünnte starke Säure kann einen höheren pH haben als eine konzentrierte schwache Säure."},
+        {type:"mc", q:"Was bedeutet „negativer dekadischer Logarithmus“ beim pH-Wert?", options:["Der pH ist der Exponent von c(H₃O⁺) mit umgekehrtem Vorzeichen: c = 10⁻ᵖᴴ mol/L.","Der pH ist die Konzentration geteilt durch 10.","Der pH zählt die H₃O⁺-Ionen in einem Liter.","Der pH ist immer eine negative Zahl."], correct:0,
+         hints:["Bei c = 10⁻³ mol/L ist pH = 3."],
+         explain:"pH = −log c(H₃O⁺). Aus c = 10⁻³ mol/L wird pH 3."},
+        {type:"mc", q:"Kann ein pH-Wert negativ sein?", options:["Ja, z. B. bei Salzsäure mit c = 2 mol/L (pH ≈ −0,3).","Nein, die Skala geht nur von 0 bis 14.","Nur bei Basen.","Nur unter 0 °C."], correct:0,
+         hints:["Rechne: −log(2) = ?"],
+         explain:"Bei c(H₃O⁺) > 1 mol/L wird der pH negativ. Die Skala 0 bis 14 deckt nur den üblichen Bereich ab."}
+      ]},
+    { name:"Anwenden", desc:"pH, pOH und Konzentrationen berechnen.",
+      jump:{type:"num", q:"Berechne den pH-Wert von Salzsäure mit c = 0,01 mol/L.", unit:"", answer:2, tol:0.05,
+            explain:"c(H₃O⁺) = 10⁻² mol/L → pH 2."},
+      tasks:[
+        {type:"num", q:"Berechne den pH-Wert von Natronlauge mit c = 0,01 mol/L.", unit:"", answer:12, tol:0.05,
+         hints:["Starte mit dem pOH: pOH = −log c(OH⁻).","pH = 14 − pOH"],
+         explain:"pOH = 2 → pH = 14 − 2 = 12."},
+        {type:"num", q:"Eine Lösung hat pH 4. Berechne c(H₃O⁺).", unit:"mol/L", answer:0.0001, tol:0.000001,
+         hints:["c(H₃O⁺) = 10⁻ᵖᴴ","10⁻⁴ als Dezimalzahl: 0,0001"],
+         explain:"c(H₃O⁺) = 10⁻⁴ mol/L = 0,0001 mol/L."},
+        {type:"num", q:"Berechne den pH-Wert von Salzsäure mit c = 0,5 mol/L. Runde auf zwei Nachkommastellen.", unit:"", answer:0.30, tol:0.011,
+         hints:["pH = −log(0,5)"],
+         explain:"pH = −log(0,5) ≈ 0,30."}
+      ]},
+    { name:"Analysieren", desc:"Werte vergleichen und Grenzen erkennen.",
+      tasks:[
+        {type:"mc", q:"Lösung A hat pH 2,5, Lösung B hat pH 4,5. Um welchen Faktor ist c(H₃O⁺) in A größer?", options:["100","2","20","1000"], correct:0,
+         explain:"Differenz 2 pH-Einheiten → Faktor 10² = 100."},
+        {type:"open", minChars:100,
+         q:"Salzsäure mit pH 3 wird immer weiter mit Wasser verdünnt.\nAnalysiere: Wird der pH-Wert irgendwann größer als 7? Begründe.",
+         criteria:["Ich beschreibe: Verdünnung um den Faktor 10 erhöht den pH um etwa 1.","Ich erkenne, dass sich der pH-Wert der 7 nähert, sie aber nicht überschreitet.","Ich begründe mit der Autoprotolyse des Wassers.","Ich ziehe einen allgemeinen Schluss."],
+         sample:"Zuerst steigt der pH mit jeder Verdünnung um den Faktor 10 um etwa eine Einheit: 3, 4, 5, 6. Kurz vor 7 greift die einfache Rechnung nicht mehr: Das Wasser selbst liefert durch Autoprotolyse 10⁻⁷ mol/L H₃O⁺, die Säure kommt nur noch dazu. Der pH nähert sich daher 7, bleibt aber darunter.\nSchluss: Durch Verdünnen wird eine saure Lösung nie basisch."}
+      ]},
+    { name:"Bewerten", desc:"Messmethoden für einen Zweck beurteilen.",
+      tasks:[
+        {type:"open", minChars:120,
+         q:"Eine Klasse untersucht auf einer Exkursion Proben aus einem Bach, einem Moor und einer Pfütze.\nBewerte, ob Universalindikator oder pH-Meter dafür besser geeignet ist.",
+         criteria:["Ich vergleiche die Genauigkeit.","Ich beziehe die Praxis ein (Kalibrieren, Robustheit, Kosten, Anzahl der Geräte).","Ich berücksichtige, dass gefärbte oder trübe Proben (Moor) die Farbablesung stören.","Ich treffe ein Urteil, ggf. mit Kombination."],
+         sample:"Das pH-Meter misst auf eine Kommastelle genau und ist auch bei gefärbten Proben zuverlässig, muss aber kalibriert werden, ist empfindlich und teuer. Universalindikator ist billig, robust und für alle Gruppen verfügbar, aber nur auf etwa eine pH-Einheit genau; braunes Moorwasser verfälscht die Farbe.\nUrteil: Indikator für den schnellen Überblick in allen Gruppen, ein pH-Meter für die Moorprobe und für Kontrollmessungen."}
+      ]},
+    { name:"Erschaffen", desc:"Eine eigene pH-Skala bauen.",
+      tasks:[
+        {type:"open", minChars:150,
+         q:"Entwickle mit Rotkohlsaft eine eigene pH-Farbskala.\nPlane, wie du Vergleichslösungen mit bekanntem pH herstellst, welche Haushaltsstoffe du dann testest und wie du die Ergebnisse darstellst.",
+         criteria:["Ich stelle Vergleichslösungen über eine Verdünnungsreihe her (Faktor 10 je Schritt).","Ich halte die Bedingungen gleich (Menge Rotkohlsaft, Volumen, Gefäße).","Ich wähle Haushaltsstoffe und begründe meine Erwartung.","Ich plane eine übersichtliche Darstellung.","Ich nenne Sicherheitsmaßnahmen."],
+         sample:"Vergleichslösungen: Salzsäure c = 0,1 mol/L (pH 1), dann je 1 mL mit 9 mL Wasser verdünnen → pH 2, 3, 4 … Genauso mit Natronlauge 0,1 mol/L (pH 13) → 12, 11, 10. Dazu Wasser als pH 7.\nIn jedes Reagenzglas 5 mL Lösung und 1 mL Rotkohlsaft. Ergebnis: Farbreihe von rot über violett und blau bis grün-gelb.\nTest: Essig, Zitronensaft, Seifenlauge, Backpulverlösung, Mineralwasser; Erwartung jeweils begründen.\nDarstellung: Foto der Reagenzglasreihe mit pH-Beschriftung, Haushaltsstoffe einordnen.\nSicherheit: Schutzbrille, verdünnte Lösungen."}
+      ]}
+    ]},
+
+  { name:"Puffersysteme", pages:"S. 112–113",
+    levels:[
+    { name:"Erinnern", desc:"Aufbau und Beispiele von Puffern abrufen.",
+      jump:{type:"mc", q:"Woraus besteht eine Pufferlösung?", options:["aus einer schwachen Säure und ihrer konjugierten Base","aus einer starken Säure und einer starken Base","aus Wasser und Kochsalz","aus einem Indikator und einer Säure"], correct:0,
+            explain:"Schwache Säure + konjugierte Base (oder schwache Base + konjugierte Säure)."},
+      tasks:[
+        {type:"mc", q:"In welchem Bereich muss der pH-Wert des Blutes bleiben?", options:["7,35 bis 7,45","6,8 bis 7,0","genau 7,0","7,6 bis 8,0"], correct:0,
+         hints:["S. 113: Der Normalwert liegt bei 7,4."],
+         explain:"Abweichungen unter 7,35 oder über 7,45 sind lebensgefährlich."},
+        {type:"mc", q:"Welches Paar bildet den Essigsäure-Acetat-Puffer?", options:["CH₃COOH und CH₃COO⁻","CH₃COOH und H₃O⁺","HCl und Cl⁻","CH₃COOH und OH⁻"], correct:0,
+         hints:["Gesucht ist ein konjugiertes Säure-Base-Paar."],
+         explain:"Essigsäure und Acetat unterscheiden sich um genau ein Proton."}
+      ]},
+    { name:"Verstehen", desc:"Erklären, wie ein Puffer abfängt.",
+      jump:{type:"mc", q:"Zum Essigsäure-Acetat-Puffer wird Salzsäure gegeben. Welches Teilchen fängt die zusätzlichen H⁺ ab?", options:["das Acetat-Ion CH₃COO⁻","die Essigsäure CH₃COOH","das Chlorid-Ion Cl⁻","das Wasser"], correct:0,
+            explain:"CH₃COO⁻ + H⁺ ⇌ CH₃COOH. Die Base des Puffers fängt Säure ab."},
+      tasks:[
+        {type:"mc", q:"Warum funktioniert eine Mischung aus Salzsäure und Chlorid-Ionen nicht als Puffer?", options:["Cl⁻ ist als konjugierte Base einer sehr starken Säure eine so schwache Base, dass es kaum Protonen aufnimmt.","Weil Chlorid-Ionen giftig sind.","Weil Salzsäure keine konjugierte Base hat.","Weil Puffer immer Stickstoff enthalten."], correct:0,
+         hints:["Erinnere dich an das Thema Stärke: starke Säure ↔ ? konjugierte Base."],
+         explain:"Ein Puffer braucht eine Base, die Protonen wirklich aufnimmt. Darum braucht man eine schwache Säure."},
+        {type:"mc", q:"„Der pH-Wert bleibt stabil“ bedeutet bei einem Puffer genau:", options:["Er ändert sich nur wenig, solange noch genug Puffersubstanz vorhanden ist.","Er ändert sich gar nicht, egal wie viel man zugibt.","Er stellt sich immer auf 7 ein.","Er steigt langsam, aber sinkt nie."], correct:0,
+         hints:["Was passiert, wenn das ganze Acetat verbraucht ist?"],
+         explain:"Jeder Puffer hat eine begrenzte Kapazität. Ist eine Komponente aufgebraucht, ändert sich der pH stark."}
+      ]},
+    { name:"Anwenden", desc:"Pufferreaktionen aufstellen und beschriften.",
+      jump:{type:"mc", q:"Welche Gleichung beschreibt die Reaktion des Essigsäure-Acetat-Puffers bei Zugabe von Natronlauge?", options:["CH₃COOH + OH⁻ ⇌ CH₃COO⁻ + H₂O","CH₃COO⁻ + OH⁻ ⇌ CH₃COOH + O²⁻","CH₃COO⁻ + H⁺ ⇌ CH₃COOH","CH₃COOH + H⁺ ⇌ CH₃COOH₂⁺"], correct:0,
+            explain:"Die Säure des Puffers neutralisiert die zugegebene Base."},
+      tasks:[
+        {type:"assign", q:"Ammoniak-Ammonium-Puffer, Zugabe einer Säure. Beschrifte.", eq:"NH₃ + H₃O⁺ ⇌ NH₄⁺ + H₂O", choices:ROLES,
+         items:[{text:"NH₃",answer:1},{text:"H₃O⁺",answer:0},{text:"NH₄⁺",answer:2},{text:"H₂O",answer:3}],
+         hints:["Bei Säurezugabe reagiert die Base des Puffers.","H₃O⁺ gibt sein Proton ab und wird zu …?"],
+         explain:"NH₃ fängt das Proton ab und wird zu NH₄⁺. Aus H₃O⁺ wird H₂O."},
+        {type:"assign", q:"Ammoniak-Ammonium-Puffer, Zugabe einer Base. Beschrifte.", eq:"NH₄⁺ + OH⁻ ⇌ NH₃ + H₂O", choices:ROLES,
+         items:[{text:"NH₄⁺",answer:0},{text:"OH⁻",answer:1},{text:"NH₃",answer:3},{text:"H₂O",answer:2}],
+         hints:["Bei Basenzugabe reagiert die Säure des Puffers.","OH⁻ nimmt ein Proton auf und wird zu …?"],
+         explain:"NH₄⁺ gibt ein Proton an OH⁻ ab. Paare: NH₄⁺/NH₃ und H₂O/OH⁻."},
+        {type:"mc", q:"Welche Kombination ergibt eine Pufferlösung?", options:["H₂CO₃ und HCO₃⁻","HCl und NaCl","NaOH und HCl","HNO₃ und NO₃⁻"], correct:0,
+         hints:["Gesucht: schwache Säure plus ihre konjugierte Base."],
+         explain:"Kohlensäure/Hydrogencarbonat ist der wichtigste Blutpuffer. HCl und HNO₃ sind zu stark."}
+      ]},
+    { name:"Analysieren", desc:"Pufferwirkung in Daten und Natur erkennen.",
+      tasks:[
+        {type:"mc", svg:TITRATION_SVG,
+         q:"Die Kurven zeigen die Titration von je 20 mL Salzsäure und Essigsäure (je c = 0,1 mol/L) mit Natronlauge (c = 0,1 mol/L).\nKurve B (Essigsäure) steigt zwischen etwa 5 und 15 mL nur flach an. Was ist dort los?",
+         options:["Essigsäure und Acetat liegen nebeneinander vor: Die Lösung wirkt als Puffer.","Die Natronlauge reagiert dort nicht.","Dort ist die Essigsäure bereits vollständig neutralisiert.","Das Messgerät ist in diesem Bereich ungenau."], correct:0,
+         explain:"Durch die Natronlauge entsteht Acetat, während noch Essigsäure übrig ist: ein Essigsäure-Acetat-Puffer. Bei 10 mL sind beide gleich konzentriert, dann gilt pH = pKs = 4,75. Kurve A hat keinen solchen Bereich."},
+        {type:"open", minChars:120,
+         q:"Je mehr CO₂ das Meer aufnimmt, desto saurer wird es.\nAnalysiere mit Reaktionsgleichungen, welche Rolle das Puffersystem Kohlensäure/Hydrogencarbonat/Carbonat dabei spielt und warum es das Problem nur begrenzt abfängt.",
+         criteria:["CO₂ + H₂O ⇌ H₂CO₃ und die Protolyse zu HCO₃⁻ + H₃O⁺ sind aufgestellt.","Ich zeige, wie Carbonat die H₃O⁺-Ionen abfängt (CO₃²⁻ + H₃O⁺ ⇌ HCO₃⁻ + H₂O).","Ich erkläre, dass dabei Carbonat verbraucht wird (z. B. fehlt es Muscheln und Korallen für Kalkschalen).","Ich gehe auf die begrenzte Pufferkapazität ein."],
+         sample:"CO₂ + H₂O ⇌ H₂CO₃; H₂CO₃ + H₂O ⇌ HCO₃⁻ + H₃O⁺.\nDie entstehenden Oxonium-Ionen werden vom Carbonat abgefangen: CO₃²⁻ + H₃O⁺ ⇌ HCO₃⁻ + H₂O. Dadurch sinkt der pH-Wert nur langsam.\nAber: Das Carbonat wird dabei verbraucht. Je weniger Carbonat da ist, desto schlechter puffert das Meer, und desto schwerer können Muscheln und Korallen Kalk (CaCO₃) aufbauen. Der Puffer verzögert die Versauerung, verhindert sie aber nicht."}
+      ]},
+    { name:"Bewerten", desc:"Ein Werbeversprechen fachlich prüfen.",
+      tasks:[
+        {type:"open", minChars:100,
+         q:"Ein Hersteller wirbt: „Basisches Wasser entsäuert deinen Körper.“\nBewerte diese Aussage fachlich.",
+         criteria:["Ich berücksichtige den Magen (Magensaft hat etwa pH 1 bis 2 und neutralisiert das Wasser).","Ich erkläre, dass der Blut-pH (7,35 bis 7,45) durch Puffer, Atmung und Nieren konstant gehalten wird.","Ich unterscheide zwischen Werbebehauptung und Beleg.","Ich formuliere ein eigenes, begründetes Urteil."],
+         sample:"Die Aussage hält einer fachlichen Prüfung nicht stand. Getrunkenes Wasser gelangt zuerst in den stark sauren Magen und wird dort neutralisiert. Der pH-Wert des Blutes wird durch den Kohlensäure-Hydrogencarbonat-Puffer, die Abatmung von CO₂ und die Nieren in einem engen Bereich gehalten; ein Getränk verschiebt ihn bei gesunden Menschen nicht messbar. Die Werbung nennt keinen Beleg.\nUrteil: Werbeversprechen ohne chemische Grundlage."}
+      ]},
+    { name:"Erschaffen", desc:"Die Pufferwirkung sichtbar machen.",
+      tasks:[
+        {type:"open", minChars:150,
+         q:"Entwirf einen Versuch, mit dem deine Klasse die Wirkung eines Puffers sichtbar macht.\nBeschreibe Material, Durchführung, Erwartung (mit Reaktionsgleichungen) und wie du zeigst, wo die Grenze des Puffers liegt.",
+         criteria:["Ich vergleiche die Pufferlösung mit einer Vergleichsprobe (Wasser).","Ich gebe Säure und Base tropfenweise zu und messe (Indikator oder pH-Meter).","Ich begründe die Erwartung mit Reaktionsgleichungen.","Ich zeige die Pufferkapazität, indem ich weiter zugebe, bis der pH umschlägt.","Ich stelle die Ergebnisse übersichtlich dar."],
+         sample:"Vier Bechergläser: zwei mit 50 mL Wasser, zwei mit 50 mL Essigsäure-Acetat-Puffer (je 0,1 mol/L Essigsäure und Natriumacetat), in alle Universalindikator.\nIn je ein Wasser- und ein Pufferglas tropfenweise Salzsäure (0,1 mol/L), in die anderen Natronlauge (0,1 mol/L). Nach jedem Tropfen Farbe bzw. pH notieren.\nErwartung: Wasser schlägt nach wenigen Tropfen um; der Puffer bleibt lange gleich (CH₃COO⁻ + H₃O⁺ ⇌ CH₃COOH + H₂O bzw. CH₃COOH + OH⁻ ⇌ CH₃COO⁻ + H₂O).\nGrenze: Weiter zugeben, bis auch der Puffer umschlägt; die Tropfenzahl zeigt die Pufferkapazität.\nDarstellung: Diagramm pH gegen Tropfenzahl für beide Proben."}
+      ]}
+    ]}
+  ]
+};
+
+const KEY_C="saeure-base-treppe-content-v2", KEY_P="saeure-base-treppe-progress-v2";
+function load(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function freshProgress(){return {tasks:{},levels:{},view:"start",topic:0,current:0,jump:false,placement:{idx:0,last:null},placementAns:null}}
+
+let content = load(KEY_C) || DEFAULT_CONTENT;
+let P = Object.assign(freshProgress(), load(KEY_P) || {});
+let teacherMsg = null;
+
+const COLORS=["--s1","--s2","--s3","--s4","--s5","--s6"];
+const col = i => `var(${COLORS[i % 6]})`;
+const esc = s => String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const persist = ()=>save(KEY_P,P);
+const L = "ABCDEFGH";
+const F = ()=> content.fundamentum ?? 3;
+const T = ()=> content.topics[P.topic];
+
+/* Antwortreihenfolge pro Aufgabe fest, aber gemischt */
+function order(n,seed){
+  let h=2166136261; for(const ch of seed){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}
+  const a=[...Array(n).keys()];
+  for(let i=n-1;i>0;i--){h=Math.imul(h^(h>>>15),2246822507)>>>0;const j=h%(i+1);[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function taskDone(t,s){ if(!s) return false; return t.type==="open" ? !!s.submitted : !!s.solved; }
+function levelCount(ti,li){ const lv=content.topics[ti].levels[li]; let d=0; lv.tasks.forEach((t,k)=>{ if(taskDone(t,P.tasks[`${ti}-${li}-${k}`])) d++; }); return [d,lv.tasks.length]; }
+const lvState = (ti,li)=>P.levels[`${ti}-${li}`];
+function fundDone(ti){ for(let i=0;i<Math.min(F(),content.topics[ti].levels.length);i++){ if(!lvState(ti,i)) return false; } return true; }
+function placementLevels(ti){ return content.topics[ti].levels.map((l,i)=>l.jump?i:-1).filter(i=>i>=0); }
+
+/* ---------- Kopf: Themen und Treppe ---------- */
+function segs(ti){
+  return `<span class="segs" aria-hidden="true">${content.topics[ti].levels.slice(0,6).map((_,i)=>`<i class="${lvState(ti,i)?"full":""} ${i===F()?"gap":""}" style="--c:${col(i)}"></i>`).join("")}</span>`;
+}
+function renderTabs(){
+  const tb=document.getElementById("tabs");
+  tb.innerHTML = content.topics.map((t,i)=>`<button class="tab" data-act="topic" data-t="${i}" aria-current="${i===P.topic}" aria-label="${esc(t.name)}, ${fundDone(i)?"Basis geschafft":"Basis offen"}">${esc(t.name)}${segs(i)}</button>`).join("");
+  const c=tb.querySelector('.tab[aria-current="true"]');
+  if(c && tb.scrollWidth>tb.clientWidth && (c.offsetLeft<tb.scrollLeft || c.offsetLeft+c.offsetWidth>tb.scrollLeft+tb.clientWidth)) tb.scrollLeft=c.offsetLeft-14;
+}
+function renderStairs(){
+  const lv=T().levels;
+  document.getElementById("stairs").innerHTML = lv.slice(0,6).map((l,i)=>{
+    const st=lvState(P.topic,i); const [d,n]=levelCount(P.topic,i);
+    const cls = st==="done"?"done":st==="skipped"?"skipped":"";
+    const cur = P.view==="level" && P.current===i ? "current":"";
+    const label = st==="done"?"geschafft":st==="skipped"?"übersprungen":d>0?`${d} von ${n}`:"";
+    return `<button class="step ${cls} ${cur}" role="listitem" data-act="level" data-i="${i}" aria-label="Stufe ${i+1}: ${esc(l.name)}${i<F()?", Basis":", Erweiterung"}${label?", "+label:""}">
+      ${st?`<span class="chk" aria-hidden="true">✓</span>`:""}<span class="n">${i+1}</span><span class="nm">${esc(l.name)}</span><span class="st">${label}</span></button>`;
+  }).join("");
+  const z=document.getElementById("zones"); const f=F(), n=Math.min(6,lv.length);
+  z.style.gridTemplateColumns = f<n ? `${f}fr ${n-f}fr` : "1fr";
+  z.innerHTML = `<div><b>Basis</b> für alle${T().pages?`, Buch ${esc(T().pages)}`:""}</div>${f<n?`<div><b>Erweiterung</b> zum Weiterdenken</div>`:""}`;
+}
+
+/* ---------- Aufgaben ---------- */
+function mcHTML(t,s,key,locked){
+  const ord=order(t.options.length,key+t.q);
+  return `<div class="opts" role="group">${ord.map((oi,pos)=>{
+    const o=t.options[oi]; const wrong=s?.wrong?.includes(oi); const right=s?.solved && oi===t.correct;
+    const dis = locked || s?.solved || wrong;
+    return `<button class="opt ${wrong?"wrong":""} ${right?"right":""}" data-act="mc" data-key="${key}" data-o="${oi}" ${dis?"disabled":""}><span class="l">${L[pos]}</span><span>${esc(o)}</span></button>`;
+  }).join("")}</div>`;
+}
+function numHTML(t,s,key,locked){
+  const dis = locked || s?.solved;
+  return `<div class="numrow"><label class="visually-hidden" for="n-${key}">Deine Antwort</label>
+    <input id="n-${key}" inputmode="decimal" value="${esc(s?.value??"")}" ${dis?"disabled":""} placeholder="Zahl">
+    ${t.unit?`<span>${esc(t.unit)}</span>`:""}
+    <button class="btn" data-act="num" data-key="${key}" ${dis?"disabled":""}>Prüfen</button></div>`;
+}
+function assignHTML(t,s,key,locked){
+  const dis = locked || s?.solved;
+  return `${t.eq?`<div class="eq">${esc(t.eq)}</div>`:""}<div class="assign">${t.items.map((it,ii)=>{
+    const sel=s?.sel?.[ii]; const mark = s?.checked ? (s.solved||sel===it.answer?"right":"wrong") : "";
+    return `<label class="${mark}"><span class="f">${esc(it.text)}</span>
+      <select data-act="sel" data-key="${key}" data-i="${ii}" ${dis?"disabled":""} aria-label="Rolle von ${esc(it.text)}">
+      <option value="">wählen …</option>${t.choices.map((c,ci)=>`<option value="${ci}" ${sel===ci?"selected":""}>${esc(c)}</option>`).join("")}</select></label>`;
+  }).join("")}</div>
+  <div class="row"><button class="btn" data-act="assign" data-key="${key}" ${dis?"disabled":""}>Prüfen</button></div>`;
+}
+function hintsHTML(t,s,key){
+  if(!t.hints?.length || s?.solved) return "";
+  const shown=s?.hints||0;
+  return `<div class="hints">${t.hints.slice(0,shown).map((h,i)=>`<p class="tip"><b>Tipp ${i+1}:</b> ${esc(h)}</p>`).join("")}
+    ${shown<t.hints.length?`<button class="link" data-act="hint" data-key="${key}">${shown?"Noch ein Tipp":"Tipp anzeigen"}</button>`:""}</div>`;
+}
+function feedbackHTML(t,s,isJump){
+  if(!s) return "";
+  if(s.solved) return `<div class="fb ok"><b>${s.tries===1?"Richtig, gleich beim ersten Versuch.":"Richtig."}</b> ${esc(t.explain||"")}</div>`;
+  if(s.tries>0 && !isJump){
+    if(t.type==="assign"){ const r=t.items.filter((it,i)=>s.sel?.[i]===it.answer).length; return `<div class="fb bad">${r} von ${t.items.length} richtig. Die rot markierten passen noch nicht.</div>`; }
+    return `<div class="fb bad">Noch nicht. Lies die Frage noch einmal genau${t.hints?.length?" oder hol dir einen Tipp":""}.</div>`;
+  }
+  return "";
+}
+function openHTML(t,s,key){
+  const sub = s?.submitted; const min=t.minChars||60;
+  let h = `<label class="visually-hidden" for="o-${key}">Deine Antwort</label>
+    <textarea id="o-${key}" data-key="${key}" placeholder="Schreib deine Antwort hier …">${esc(s?.text||"")}</textarea>
+    <p class="hint" id="c-${key}">${(s?.text||"").length} Zeichen${sub?"":`, mindestens ${min}`}</p>`;
+  if(!sub) return h + `<div class="row"><button class="btn primary" data-act="submit" data-key="${key}">Antwort abgeben</button></div>`;
+  h += `<div class="crit"><p>Prüf deine Antwort selbst: Was davon hast du geschafft?</p>${t.criteria.map((c,ci)=>
+      `<label><input type="checkbox" data-act="crit" data-key="${key}" data-c="${ci}" ${s.checks?.[ci]?"checked":""}><span>${esc(c)}</span></label>`).join("")}</div>
+    <details><summary>Musterlösung ansehen</summary><p class="sample">${esc(t.sample||"")}</p></details>
+    <p class="hint">Du kannst deine Antwort jederzeit überarbeiten.</p>`;
+  return h;
+}
+function taskHTML(t,s,key,num,locked,isJump){
+  const body = t.type==="mc"?mcHTML(t,s,key,locked):t.type==="num"?numHTML(t,s,key,locked):t.type==="assign"?assignHTML(t,s,key,locked):openHTML(t,s,key);
+  return `<article class="task">
+    <p class="k">${isJump?"Sprungaufgabe":"Aufgabe "+num}</p>
+    <p class="q">${esc(t.q)}</p>
+    ${t.svg?`<div class="fig">${t.svg}</div>`:""}
+    ${body}
+    ${t.type!=="open"?feedbackHTML(t,s,isJump):""}
+    ${!isJump && t.type!=="open"?hintsHTML(t,s,key):""}
+  </article>`;
+}
+
+/* ---------- Ansichten ---------- */
+function minis(ti){
+  return `<span class="minis" aria-hidden="true">${content.topics[ti].levels.slice(0,6).map((_,i)=>`<i class="${lvState(ti,i)?"full":""} ${i===F()?"gap":""}" style="--c:${col(i)}"></i>`).join("")}</span>`;
+}
+function viewStart(){
+  const pl=placementLevels(P.topic);
+  return `<h2 class="plain">${esc(T().name)}</h2>
+  <p>Die Stufen folgen der Lernzieltaxonomie nach Bloom. <b>Stufe 1 bis ${F()}</b> sind die Basis: Die sollen alle sicher können, Tipps helfen dir dabei. <b>Ab Stufe ${F()+1}</b> geht es weiter, so weit du willst. Was du schon kannst, darfst du überspringen.</p>
+  <div class="choices">
+    ${pl.length?`<button class="choice" data-act="placement"><b>Einstufung machen</b><span>${pl.length} kurze Fragen zeigen dir, welche Stufen du überspringen kannst.</span></button>`:""}
+    <button class="choice" data-act="level" data-i="0"><b>Unten beginnen</b><span>Stufe für Stufe, vom Erinnern bis zum Erschaffen.</span></button>
+  </div>
+  <h3 style="margin-top:30px">Alle Themen</h3>
+  <div class="tcards">${content.topics.map((t,i)=>`<button class="tcard" data-act="topic" data-t="${i}" aria-current="${i===P.topic}"><b>${esc(t.name)}</b><small>${t.pages?"Buch "+esc(t.pages)+" · ":""}${fundDone(i)?"Basis geschafft ✓":"Basis offen"}</small>${segs(i)}</button>`).join("")}</div>`;
+}
+function viewPlacement(){
+  const pl=placementLevels(P.topic); const p=P.placement; const lvs=T().levels;
+  if(p.idx>=pl.length || p.done){
+    const start = p.done ? pl[p.idx] : Math.min(pl[pl.length-1]+1, lvs.length-1);
+    const skipped = pl.filter(i=>lvState(P.topic,i)==="skipped").length;
+    return `<h2 class="plain">Dein Einstieg: Stufe ${start+1}</h2>
+      <p>${skipped?`Du hast ${skipped} ${skipped===1?"Stufe":"Stufen"} übersprungen. `:""}Ab <b>${esc(lvs[start].name)}</b> wird es für dich interessant.
+      ${p.done?"Diese Stufe lohnt sich noch, danach geht es weiter nach oben.":""}</p>
+      <div class="row"><button class="btn primary" data-act="level" data-i="${start}">Stufe ${start+1} starten</button></div>`;
+  }
+  const li=pl[p.idx]; const t=lvs[li].jump; const s=P.placementAns;
+  const answered = s && (s.solved || s.tries>0);
+  return `<div class="lvlhead" style="--c:${col(li)}"><h2>Einstufung ${p.idx+1} von ${pl.length}</h2><p>Eine Frage aus Stufe ${li+1}: ${esc(lvs[li].name)}. Du hast einen Versuch.</p></div>
+    ${taskHTML(t,s,"place",0,answered,true)}
+    ${answered && !s.solved?`<div class="fb bad">Nicht ganz. Diese Stufe lohnt sich also noch für dich.</div>`:""}
+    ${answered?`<div class="row"><button class="btn primary" data-act="placenext">Weiter</button></div>`:""}`;
+}
+function viewLevel(){
+  const ti=P.topic, li=P.current, lv=T().levels[li], st=lvState(ti,li);
+  const [d,n]=levelCount(ti,li); const base = li<F();
+  let h=`<div class="lvlhead" style="--c:${col(li)}"><h2>Stufe ${li+1}: ${esc(lv.name)}<span class="badge">${base?"Basis":"Erweiterung"}</span></h2><p>${esc(lv.desc||"")}${base&&T().pages?` Nachlesen: Buch ${esc(T().pages)}.`:""}</p></div>
+    <div class="progressbar" style="--c:${col(li)}" aria-label="${d} von ${n} Aufgaben erledigt"><i style="width:${n?d/n*100:0}%"></i></div>`;
+  if(st==="skipped") h+=`<div class="fb ok" style="margin:0 0 16px">Diese Stufe hast du mit der Sprungaufgabe übersprungen. Du kannst sie trotzdem bearbeiten oder <button class="link" data-act="next">gleich weitergehen</button>.</div>`;
+  if(P.jump && lv.jump){
+    const k=`${ti}-${li}-jump`; const s=P.tasks[k]; const answered = s && (s.solved||s.tries>0);
+    h+=taskHTML(lv.jump,s,k,0,answered,true);
+    if(answered){
+      h+= s.solved ? `<div class="row"><button class="btn primary" data-act="next">Zur nächsten Stufe</button></div>`
+                   : `<div class="fb info">Diese Stufe lohnt sich für dich. Los geht's mit den Aufgaben.</div><div class="row"><button class="btn primary" data-act="unjump">Aufgaben bearbeiten</button></div>`;
+    } else h+=`<div class="row"><button class="link" data-act="unjump">Doch lieber die Aufgaben</button></div>`;
+    return h;
+  }
+  if(lv.jump && !st && d===0 && !P.tasks[`${ti}-${li}-jump`])
+    h+=`<div class="jump"><p>Kannst du das schon? Löse eine einzige Aufgabe richtig und spring eine Stufe höher.</p><button class="btn" data-act="jump">Sprungaufgabe</button></div>`;
+  lv.tasks.forEach((t,k)=>{ h+=taskHTML(t,P.tasks[`${ti}-${li}-${k}`],`${ti}-${li}-${k}`,k+1,false,false); });
+  const last = li===T().levels.length-1;
+  if(st==="done"){
+    const msg = li===F()-1 ? "Stufe geschafft. Damit hast du die Basis dieses Themas erreicht." : "Stufe geschafft.";
+    h+=`${burstHTML()}<div class="fb ok">${msg}</div><div class="row">${last?`<button class="btn primary" data-act="nexttopic">${P.topic<content.topics.length-1?"Zum nächsten Thema":"Fortschritt ansehen"}</button>`:`<button class="btn primary" data-act="next">Zu Stufe ${li+2}</button>`}${li===F()-1&&!last?`<button class="btn" data-act="nexttopic">Erst die Basis im nächsten Thema</button>`:""}</div>`;
+  }
+  else h+=`<div class="row"><button class="btn primary" data-act="finish" ${d<n?"disabled":""}>Stufe abschließen</button>${d<n?`<span class="hint" style="margin:0">Noch ${n-d} ${n-d===1?"Aufgabe":"Aufgaben"} offen</span>`:""}</div>`;
+  return h;
+}
+let celebrate=false;
+function burstHTML(){
+  if(!celebrate) return "";
+  const cs=["--s1","--s2","--s3","--s4","--s5","--s6"]; let s="";
+  for(let i=0;i<18;i++){ const x=Math.round((Math.random()*2-1)*220), y=Math.round(-40-Math.random()*120), r=Math.round(Math.random()*540);
+    s+=`<i style="left:${10+Math.random()*60}%;background:var(${cs[i%6]});--x:${x}px;--y:${y}px;--r:${r}deg;animation-delay:${(i%6)*20}ms"></i>`; }
+  return `<div class="burst" aria-hidden="true">${s}</div>`;
+}
+function statusText(ti,li){
+  const st=lvState(ti,li); const [d,n]=levelCount(ti,li);
+  return st==="done"?"geschafft":st==="skipped"?"übersprungen":d>0?`${d} von ${n} Aufgaben`:"noch offen";
+}
+function reportText(){
+  const date=new Date().toLocaleDateString("de-AT");
+  let r=`${content.title}: Bloom-Treppe\nStand: ${date}\n`;
+  content.topics.forEach((tp,ti)=>{
+    r+=`\n== ${tp.name} (${fundDone(ti)?"Basis geschafft":"Basis offen"}) ==\n`;
+    tp.levels.forEach((lv,li)=>{
+      r+=`Stufe ${li+1} ${lv.name}: ${statusText(ti,li)}\n`;
+      lv.tasks.forEach((t,k)=>{ const s=P.tasks[`${ti}-${li}-${k}`];
+        if(t.type==="open" && s?.submitted){
+          const c=(s.checks||[]).filter(Boolean).length;
+          r+=`  Aufgabe ${k+1}: ${t.q.split("\n")[0]}\n  Meine Antwort: ${s.text.replace(/\n/g,"\n  ")}\n  Selbstcheck: ${c} von ${t.criteria.length} Kriterien erfüllt\n`;
+        }});
+    });
+  });
+  return r.trim();
+}
+function viewSummary(){
+  return `<h2 class="plain">Mein Fortschritt</h2>
+  ${content.topics.map((tp,ti)=>`<h3 style="margin-top:20px">${esc(tp.name)} <span class="badge">${fundDone(ti)?"Basis geschafft":"Basis offen"}</span></h3>
+  <ul class="sumlist">${tp.levels.map((lv,i)=>{const st=lvState(ti,i);
+    return `<li><span class="dot ${st?"full":""}" style="--c:${col(i)}"></span><button class="link" data-act="goto" data-t="${ti}" data-i="${i}">Stufe ${i+1}: ${esc(lv.name)}</button><span class="s">${statusText(ti,i)}</span></li>`}).join("")}</ul>`).join("")}
+  <h3>Lernnachweis für dein Portfolio</h3>
+  <p class="hint" style="margin:0 0 8px">Enthält deinen Stand in allen Themen, deine Antworten auf die offenen Aufgaben und deinen Selbstcheck.</p>
+  <textarea id="report" readonly>${esc(reportText())}</textarea>
+  <div class="row"><button class="btn primary" data-act="copy">Text kopieren</button><span class="hint" id="copied" style="margin:0"></span></div>
+  <div class="row" style="margin-top:28px"><button class="btn" data-act="reset">Fortschritt zurücksetzen</button></div>`;
+}
+function viewTeacher(){
+  return `<div class="teacher"><h2 class="plain">Für Lehrkräfte</h2>
+  <p><b>Fundamentum und Additum.</b> Jedes Thema des Kapitels ist eine Treppe nach Blooms Lernzieltaxonomie. Die Stufen 1 bis ${F()} bilden das Fundamentum, das alle erreichen sollen. Sie folgen eng dem Foliensatz, verweisen auf die Buchseiten und bieten gestufte Tipps. Ab Stufe ${F()+1} beginnt das Additum: offene Aufgaben zum Analysieren, Bewerten und Erschaffen, die mit Kriterien selbst eingeschätzt werden.</p>
+  <p><b>Differenzierung in beide Richtungen.</b> Wer Unterstützung braucht, holt sich Tipps und kann die Basis Schritt für Schritt erarbeiten. Wer die Grundlagen bereits beherrscht, beweist das mit einer Sprungaufgabe oder der Einstufung und arbeitet sofort auf höheren Denkstufen (Compacting). Lernende können nach der Basis auch erst ins nächste Thema wechseln. Die Antwortreihenfolge wird pro Aufgabe gemischt.</p>
+  <p><b>Die Farben</b> der Stufen folgen der Skala des Universalindikators, von rot bis violett.</p>
+  <h3 style="margin-top:24px">Inhalte anpassen</h3>
+  <p>Der gesamte Inhalt steckt in der Struktur unten: <code>topics</code> mit je bis zu sechs <code>levels</code>; <code>fundamentum</code> legt fest, wie viele Stufen zur Basis gehören. Aufgabentypen: <code>mc</code> (Auswahl, <code>correct</code> zählt ab 0), <code>num</code> (Zahl mit Toleranz <code>tol</code>), <code>assign</code> (Teilchen einer Gleichung <code>eq</code> den <code>choices</code> zuordnen), <code>open</code> (mit <code>criteria</code> und <code>sample</code>). Optional: <code>hints</code> für gestufte Tipps, <code>jump</code> pro Stufe für Sprungaufgabe und Einstufung. Eigene Inhalte werden nur in diesem Browser gespeichert.</p>
+  <label class="visually-hidden" for="json">Inhalt als JSON</label>
+  <textarea id="json" spellcheck="false">${esc(JSON.stringify(content,null,2))}</textarea>
+  ${teacherMsg?`<div class="fb ${teacherMsg.ok?"ok":"bad"}">${esc(teacherMsg.text)}</div>`:""}
+  <div class="row"><button class="btn primary" data-act="applyjson">Inhalt übernehmen</button><button class="btn" data-act="defaultjson">Originalinhalt wiederherstellen</button></div>
+  <p class="hint">Beim Übernehmen wird der Fortschritt in diesem Browser zurückgesetzt.</p></div>`;
+}
+
+function render(){
+  document.getElementById("title").textContent = content.title;
+  document.getElementById("subtitle").textContent = content.subtitle||"";
+  document.title = content.title+": Bloom-Treppe";
+  renderTabs(); renderStairs();
+  const v=P.view; const panel=document.getElementById("panel");
+  panel.innerHTML = v==="level"?viewLevel():v==="placement"?viewPlacement():v==="summary"?viewSummary():v==="teacher"?viewTeacher():viewStart();
+  panel.querySelectorAll(".fb").forEach(el=>{ const k=el.classList.contains("ok")?"✓":el.classList.contains("bad")?"✕":"i"; el.innerHTML=`<span class="ico" aria-hidden="true">${k}</span><div>${el.innerHTML}</div>`; });
+  const navView = v==="summary"?"summary":v==="teacher"?"teacher":"home";
+  document.querySelectorAll("[data-nav]").forEach(b=>{ if(b.dataset.nav===navView) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
+  document.getElementById("hero").classList.toggle("compact", v!=="start");
+  celebrate=false;
+  persist();
+}
+function go(view,extra,scrollTo){
+  Object.assign(P,{view},extra||{}); render();
+  const el=document.getElementById(scrollTo||"panel"); const r=el.getBoundingClientRect();
+  if(scrollTo || r.top<70 || r.top>innerHeight*0.6) el.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+}
+
+/* ---------- Logik ---------- */
+const isOneShot = key => key==="place" || key.endsWith("-jump");
+function getTask(key){
+  if(key==="place"){ const li=placementLevels(P.topic)[P.placement.idx]; return T().levels[li].jump; }
+  const [ti,li,k]=key.split("-"); const lv=content.topics[+ti].levels[+li];
+  return k==="jump"?lv.jump:lv.tasks[+k];
+}
+function getState(key){ if(key==="place") return P.placementAns||(P.placementAns={tries:0,wrong:[]}); return P.tasks[key]||(P.tasks[key]={tries:0,wrong:[]}); }
+function afterAnswer(key,correct){
+  if(key==="place"){ if(correct){ const li=placementLevels(P.topic)[P.placement.idx]; P.levels[`${P.topic}-${li}`]="skipped"; } P.placement.last=correct; return; }
+  const [ti,li,k]=key.split("-");
+  if(k==="jump" && correct) P.levels[`${ti}-${li}`]="skipped";
+}
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]"); if(!b || b.tagName==="SELECT") return;
+  const a=b.dataset.act, key=b.dataset.key;
+  if(a==="home") return go("start");
+  if(a==="summary") return go("summary");
+  if(a==="teacher"){ teacherMsg=null; return go("teacher"); }
+  if(a==="topic"){ const fromCard=b.classList.contains("tcard"); return go("start",{topic:+b.dataset.t,jump:false,placement:{idx:0,last:null},placementAns:null},fromCard?"tabs":null); }
+  if(a==="goto") return go("level",{topic:+b.dataset.t,current:+b.dataset.i,jump:false});
+  if(a==="level") return go("level",{current:+b.dataset.i,jump:false});
+  if(a==="next"){ const n=P.current+1; return n<T().levels.length?go("level",{current:n,jump:false}):go("summary"); }
+  if(a==="nexttopic"){ const n=P.topic+1; return n<content.topics.length?go("start",{topic:n,jump:false,placement:{idx:0,last:null},placementAns:null},"tabs"):go("summary"); }
+  if(a==="jump"){ P.jump=true; return render(); }
+  if(a==="unjump"){ P.jump=false; return render(); }
+  if(a==="hint"){ const s=getState(key); s.hints=(s.hints||0)+1; return render(); }
+  if(a==="placement"){ placementLevels(P.topic).forEach(i=>{ if(lvState(P.topic,i)==="skipped") delete P.levels[`${P.topic}-${i}`]; }); P.placement={idx:0,last:null}; P.placementAns=null; return go("placement"); }
+  if(a==="placenext"){ if(P.placement.last){ P.placement.idx++; P.placement.last=null; } else P.placement.done=true; P.placementAns=null; return render(); }
+  if(a==="mc"){
+    const t=getTask(key), s=getState(key), o=+b.dataset.o; s.tries++;
+    if(o===t.correct){ s.solved=true; afterAnswer(key,true); }
+    else { s.wrong.push(o); if(isOneShot(key)) afterAnswer(key,false); }
+    return render();
+  }
+  if(a==="num"){
+    const t=getTask(key), s=getState(key); const inp=document.getElementById("n-"+key);
+    const raw=inp.value.trim().replace(/\s/g,"").replace("−","-").replace(",","."); const v=Number(raw);
+    if(raw===""||isNaN(v)){ inp.focus(); return; }
+    s.value=inp.value; s.tries++;
+    if(Math.abs(v-t.answer)<=(t.tol??0.01)+1e-12){ s.solved=true; afterAnswer(key,true); }
+    else if(isOneShot(key)) afterAnswer(key,false);
+    return render();
+  }
+  if(a==="assign"){
+    const t=getTask(key), s=getState(key); s.sel=s.sel||[];
+    if(t.items.some((_,i)=>s.sel[i]===undefined||s.sel[i]===null)){ const f=document.querySelector(`select[data-key="${key}"]:not([disabled])`); const empty=[...document.querySelectorAll(`select[data-key="${key}"]`)].find(x=>x.value===""); (empty||f)?.focus(); return; }
+    s.tries++; s.checked=true;
+    const ok=t.items.every((it,i)=>s.sel[i]===it.answer);
+    if(ok){ s.solved=true; afterAnswer(key,true); } else if(isOneShot(key)) afterAnswer(key,false);
+    return render();
+  }
+  if(a==="submit"){
+    const t=getTask(key), s=getState(key); const ta=document.getElementById("o-"+key);
+    s.text=ta.value; const min=t.minChars||60;
+    if(s.text.trim().length<min){ document.getElementById("c-"+key).textContent=`${s.text.length} Zeichen. Schreib noch etwas mehr (mindestens ${min}).`; ta.focus(); persist(); return; }
+    s.submitted=true; s.checks=s.checks||[]; return render();
+  }
+  if(a==="finish"){ P.levels[`${P.topic}-${P.current}`]="done"; celebrate=true; return render(); }
+  if(a==="copy"){
+    const ta=document.getElementById("report"); const msg=document.getElementById("copied");
+    const fallback=()=>{ ta.focus(); ta.select(); try{ document.execCommand("copy"); msg.textContent="Kopiert."; }catch(err){ msg.textContent="Text ist markiert: mit Strg+C kopieren."; } };
+    if(navigator.clipboard?.writeText) navigator.clipboard.writeText(ta.value).then(()=>msg.textContent="Kopiert.",fallback); else fallback();
+    return;
+  }
+  if(a==="reset"){
+    if(b.dataset.armed){ P=freshProgress(); return go("start"); }
+    b.dataset.armed="1"; b.textContent="Wirklich alles zurücksetzen? Nochmals klicken"; return;
+  }
+  if(a==="applyjson"){
+    try{
+      const c=JSON.parse(document.getElementById("json").value);
+      if(!c.title||!Array.isArray(c.topics)||!c.topics.length) throw new Error("Es braucht einen Titel und mindestens ein Thema in topics.");
+      c.topics.forEach((tp,ti)=>{
+        if(!tp.name||!Array.isArray(tp.levels)||!tp.levels.length||tp.levels.length>6) throw new Error(`Thema ${ti+1} braucht einen Namen und 1 bis 6 Stufen.`);
+        tp.levels.forEach((lv,i)=>{ const where=`Thema ${ti+1}, Stufe ${i+1}`;
+          if(!lv.name||!Array.isArray(lv.tasks)||!lv.tasks.length) throw new Error(`${where} braucht einen Namen und mindestens eine Aufgabe.`);
+          [...lv.tasks,...(lv.jump?[lv.jump]:[])].forEach((t,k)=>{ const w=`${where}, Aufgabe ${k+1}`;
+            if(!["mc","num","open","assign"].includes(t.type)||!t.q) throw new Error(`${w}: Typ (mc, num, assign oder open) und Frage q fehlen.`);
+            if(t.type==="mc"&&(!Array.isArray(t.options)||typeof t.correct!=="number")) throw new Error(`${w}: options und correct fehlen.`);
+            if(t.type==="num"&&typeof t.answer!=="number") throw new Error(`${w}: answer muss eine Zahl sein.`);
+            if(t.type==="assign"&&(!Array.isArray(t.items)||!Array.isArray(t.choices))) throw new Error(`${w}: items und choices fehlen.`);
+            if(t.type==="open"&&!Array.isArray(t.criteria)) throw new Error(`${w}: criteria fehlen.`);
+          }); });
+      });
+      content=c; save(KEY_C,c); P=Object.assign(freshProgress(),{view:"teacher"}); teacherMsg={ok:true,text:"Übernommen. Die Treppen zeigen jetzt deine Inhalte."};
+    }catch(err){ teacherMsg={ok:false,text:"Nicht übernommen: "+(err instanceof SyntaxError?"Die Struktur ist kein gültiges JSON (oft fehlt ein Komma oder eine Klammer).":err.message)}; }
+    return render();
+  }
+  if(a==="defaultjson"){ content=DEFAULT_CONTENT; try{localStorage.removeItem(KEY_C)}catch(e){} P=Object.assign(freshProgress(),{view:"teacher"}); teacherMsg={ok:true,text:"Originalinhalt wiederhergestellt."}; return render(); }
+});
+document.addEventListener("change",e=>{
+  const c=e.target.closest('[data-act="crit"]');
+  if(c){ const s=getState(c.dataset.key); s.checks=s.checks||[]; s.checks[+c.dataset.c]=c.checked; persist(); return; }
+  const sel=e.target.closest('select[data-act="sel"]');
+  if(sel){ const s=getState(sel.dataset.key); s.sel=s.sel||[]; s.sel[+sel.dataset.i]=sel.value===""?null:+sel.value; s.checked=false;
+    sel.closest("label").classList.remove("wrong","right"); persist(); }
+});
+document.addEventListener("input",e=>{
+  const ta=e.target; if(ta.tagName!=="TEXTAREA"||!ta.dataset.key) return;
+  const s=getState(ta.dataset.key); s.text=ta.value; const t=getTask(ta.dataset.key);
+  const h=document.getElementById("c-"+ta.dataset.key); if(h) h.textContent=`${ta.value.length} Zeichen${s.submitted?"":`, mindestens ${t.minChars||60}`}`;
+  persist();
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Enter" && e.target.matches?.(".numrow input")){ e.preventDefault(); e.target.parentElement.querySelector('[data-act="num"]').click(); }
+});
+if(!content.topics?.[P.topic] || (P.view==="level" && !T().levels[P.current])) P=freshProgress();
+render();
+
+</script>
+</body>
+</html>
